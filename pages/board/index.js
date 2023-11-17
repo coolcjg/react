@@ -1,4 +1,5 @@
 import { useSearchParams } from "next/navigation";
+import Header from "../components/header";
 
 const Index = ({data}) => {
 
@@ -10,19 +11,33 @@ const Index = ({data}) => {
 
     if(pageNum === null){
         pageNum = 1;
-    }      
-    if(data != null){
+    }
+    if(data.code == 200){
+
         return (
             <>
-            <div>{data.pageNumber}/{data.pageSize}페이지</div>
-            {data.boardList.map((board, index) =>(
-                    <div key = {index}>
-                        <p >{board.title}</p>
-                    </div>            
-                ))
-            }
+                <Header></Header>
+                
+                <div>{data.pageNumber}/{data.pageSize}페이지</div>
+
+                <div>
+                {data.boardList.map((board, index) =>(
+                        <div key = {index}>
+                            <p >{board.title}</p>
+                        </div>            
+                    ))
+                }
+                </div>
             </>
         )        
+
+    }else{
+        return (
+            <>
+                <Header></Header>
+                <div>에러 코드 : {data.code}</div>
+            </>
+        )         
 
     }
 
@@ -38,11 +53,10 @@ export async function getServerSideProps(context){
         }
 
         const res = await fetch('http://localhost:8080/board/list?pageNumber='+pageNumber);
-        console.log("aaa");
         const data = await res.json();
         return {props:{data}}
     }catch(error){
-        return {props:{}};
+        return {props:{data:{code:'F500'}}};
     }
 
     
