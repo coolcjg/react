@@ -29,8 +29,20 @@ const Index = () => {
         }
     }
 
-    function checkId(id){
+    async function checkId(){
         console.log(id);
+
+        try{
+            const res = await fetch('http://localhost:8080/user/count/?userId='+id);
+            const data = await res.json();                    
+
+            console.log("checkId result data : " + data);
+            console.log( data);
+
+        }catch(error){
+            console.log("checkId error");
+            return {props:{data:{code:'F500'}}};
+        }
 
     }
 
@@ -54,8 +66,8 @@ const Index = () => {
 
                         <Form>
                             <InputGroup className="mb-3">
-                                <Form.Control placeholder="아이디" id="id" onChange={(event) => setId(event.target.value)}/>
-                                <Button variant="outline-secondary" onClick={()=>checkId}>중복확인</Button>
+                                <Form.Control placeholder="아이디" id="id" value={id} onChange={(event) => setId(event.target.value)}/>
+                                <Button variant="outline-secondary" onClick={()=>checkId()}>중복확인</Button>
                             </InputGroup>
 
                             <Form.Group className="mb-3" controlId="password">
@@ -64,7 +76,7 @@ const Index = () => {
                             </Form.Group>                                                            
 
                             <Form.Group className="mb-3" controlId="name">
-                                <Form.Control placeholder="name"/>
+                                <Form.Control placeholder="이름"/>
                             </Form.Group>
 
                             <InputGroup className="mb-3">
@@ -86,7 +98,7 @@ const Index = () => {
                                     onClickDay={(value, event) => updateDate(value)}
                                     ></Calendar>
                             </Form.Group>
-
+                            
                             <Button type="submit">가입</Button>
                             
                         </Form>
