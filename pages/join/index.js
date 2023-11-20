@@ -18,8 +18,8 @@ const Index = () => {
     const [show, setShow] = useState('d-none');
     const [date, setDate] = useState('');
     const [id, setId] = useState('');
-
-    
+    const [validId, setValidId] = useState(false);
+    const [validPassword, setValidPassword] = useState(false);
 
     function showCalendar(){
         if(show === 'd-none'){
@@ -29,21 +29,60 @@ const Index = () => {
         }
     }
 
+    function changeId(id){
+        console.log("changeId : " + id);
+        setValidId(false);
+        setId(id);
+    }
+
     async function checkId(){
         console.log(id);
+
+        var regex  = /^[a-z]+[a-z0-9]{3,19}$/g;
+        const result = regex.test(id);
+
+        if(result == false){
+            alert('아이디는 영문 소문자로 시작, 영문소문자 + 숫자 조합 4~20자리만 가능합니다.');
+            return;
+        }
 
         try{
             const res = await fetch('http://localhost:8080/user/count/?userId='+id);
             const data = await res.json();                    
 
-            console.log("checkId result data : " + data);
-            console.log( data);
+            if(data.code == 200){
+
+                if(data.count == 0){
+                    alert('사용 가능한 아이디입니다.');
+                    setValidId(true);
+
+                }else{
+                    alert('사용 불가능한 아이디입니다.');
+                    setValidId(false);
+                }
+
+            }else{
+                alert('서버 에러 발생');
+            }
 
         }catch(error){
             console.log("checkId error");
             return {props:{data:{code:'F500'}}};
         }
 
+    }
+
+    function checkPassword(password){
+        console.log("password : " + password);
+
+        var regex  = /^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[`~!@#$%^&*\\(\\)\-_=+]).{8,20}$/g
+    
+        const result = regex.test(password);        
+        if(result == true){
+            setValidPassword(true);
+        }else{
+            setValidPassword(false);
+        }
     }
 
     function updateDate(date){
@@ -66,14 +105,20 @@ const Index = () => {
 
                         <Form>
                             <InputGroup className="mb-3">
-                                <Form.Control placeholder="아이디" id="id" value={id} onChange={(event) => setId(event.target.value)}/>
+                                <Form.Control placeholder="아이디" id="id" value={id} onChange={(event) => changeId(event.target.value)}/>
                                 <Button variant="outline-secondary" onClick={()=>checkId()}>중복확인</Button>
                             </InputGroup>
 
                             <Form.Group className="mb-3" controlId="password">
-                                <Form.Control type="password" placeholder="비밀번호"/>
-                                <Form.Control.Feedback type="invalid">Looks good!</Form.Control.Feedback>
-                            </Form.Group>                                                            
+                                <Form.Control type="password" placeholder="비밀번호" onChange={(evnet) => checkPassword(evnet.target.value)} isInvalid={!validPassword} />
+                                <Form.Control.Feedback type="invalid">
+                                {'영문자, 숫자 특수문자(`~!@#$%^&*()-_=+) 조합 8~20자리'}
+                                </Form.Control.Feedback>                                
+                            </Form.Group>
+
+                            <Form.Group className="mb-3" controlId="password2">
+                                <Form.Control type="password" placeholder="비밀번호 확인"/>
+                            </Form.Group>
 
                             <Form.Group className="mb-3" controlId="name">
                                 <Form.Control placeholder="이름"/>
