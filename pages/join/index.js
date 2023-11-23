@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState, useRef } from 'react'
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row'
@@ -19,7 +19,11 @@ const Index = () => {
     const [date, setDate] = useState('');
     const [id, setId] = useState('');
     const [validId, setValidId] = useState(false);
-    const [validPassword, setValidPassword] = useState(false);
+    const [validPassword, setValidPassword] = useState(true);
+    const [equalPassword, setEqualPassword] = useState(true);
+    const [password1, setPassword1] = useState('')
+    const [password2, setPassword2] = useState('')
+
 
     function showCalendar(){
         if(show === 'd-none'){
@@ -30,13 +34,11 @@ const Index = () => {
     }
 
     function changeId(id){
-        console.log("changeId : " + id);
         setValidId(false);
         setId(id);
     }
 
     async function checkId(){
-        console.log(id);
 
         var regex  = /^[a-z]+[a-z0-9]{3,19}$/g;
         const result = regex.test(id);
@@ -66,17 +68,16 @@ const Index = () => {
             }
 
         }catch(error){
-            console.log("checkId error");
+            console.error("checkId error");
             return {props:{data:{code:'F500'}}};
         }
 
     }
 
     function checkPassword(password){
-        console.log("password : " + password);
-
+        setPassword1(password);
         var regex  = /^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[`~!@#$%^&*\\(\\)\-_=+]).{8,20}$/g
-    
+
         const result = regex.test(password);        
         if(result == true){
             setValidPassword(true);
@@ -85,12 +86,18 @@ const Index = () => {
         }
     }
 
+    function checkPasswordEqual(password){
+        setPassword2(password);
+        setEqualPassword(password1 == password);       
+    }
+
     function updateDate(date){
         setDate(moment(value).format('YYYY-MM-DD'));
         showCalendar();
     }
 
-    const [validated, setValidated] = useState(false);
+    function join(){
+    }
 
     return(
         <>
@@ -110,14 +117,17 @@ const Index = () => {
                             </InputGroup>
 
                             <Form.Group className="mb-3" controlId="password">
-                                <Form.Control type="password" placeholder="비밀번호" onChange={(evnet) => checkPassword(evnet.target.value)} isInvalid={!validPassword} />
+                                <Form.Control type="password" placeholder="비밀번호" value={password1} onChange={(event) => checkPassword(event.target.value)} isInvalid={!validPassword} />
                                 <Form.Control.Feedback type="invalid">
                                 {'영문자, 숫자 특수문자(`~!@#$%^&*()-_=+) 조합 8~20자리'}
                                 </Form.Control.Feedback>                                
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="password2">
-                                <Form.Control type="password" placeholder="비밀번호 확인"/>
+                                <Form.Control type="password" placeholder="비밀번호 확인" value={password2} onChange={(event) => checkPasswordEqual(event.target.value)} isInvalid={!equalPassword}/>
+                                <Form.Control.Feedback type="invalid">
+                                {'비밀번호가 맞지 않습니다'}
+                                </Form.Control.Feedback>                                 
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="name">
@@ -141,10 +151,11 @@ const Index = () => {
                                     formatMonth={(locale, date) => moment(date).format("M")}
                                     formatYear={(locale, date) => moment(date).format("YYYY")}
                                     onClickDay={(value, event) => updateDate(value)}
+                                    maxDate={new Date()}
                                     ></Calendar>
                             </Form.Group>
                             
-                            <Button type="submit">가입</Button>
+                            <Button type="button" onClick={join}>가입</Button>
                             
                         </Form>
                     </Col>
