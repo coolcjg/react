@@ -18,7 +18,7 @@ const Header = () => {
                         <Nav.Link href="/board">게시판</Nav.Link>
                     </Nav>
 
-                    <Button variant="outline-success" size="sm" className="mx-1">로그인</Button>
+                    <Button variant="outline-success" size="sm" className="mx-1" onClick={() => router.push({pathname:"/login"})}>로그인</Button>
                     <Button variant="outline-success" size="sm" onClick={()=> router.push({pathname:"/join"})}>회원가입</Button>
 
                 </Container>

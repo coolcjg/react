@@ -8,28 +8,37 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import Calendar from 'react-calendar'
 import moment from 'moment'
+import crypto from "crypto"
+import Router, {useRouter} from 'next/router'
 import 'react-calendar/dist/Calendar.css';
 
 
 const Index = () => {
 
-    const [value, onChange] = useState(new Date());
-
-    const [show, setShow] = useState('d-none');
-    const [date, setDate] = useState('');
+    const router = useRouter();
+    
     const [id, setId] = useState('');
     const [validId, setValidId] = useState(false);
-    const [validPassword, setValidPassword] = useState(true);
-    const [equalPassword, setEqualPassword] = useState(true);
+    
     const [password1, setPassword1] = useState('')
-    const [password2, setPassword2] = useState('')
+    const [validPassword, setValidPassword] = useState(true);
 
+    const [password2, setPassword2] = useState('')
+    const [equalPassword, setEqualPassword] = useState(true);
+
+    const [name, setName] = useState('');
+    const [validName, setValidName] = useState(true);
+
+    const [today, setToday] = useState(new Date());
+    const [birthDay, setBirthDay] = useState('');
+    const [calendarShow, setCalendarShow] = useState('d-none');
+   
 
     function showCalendar(){
-        if(show === 'd-none'){
-            setShow('');
+        if(calendarShow === 'd-none'){
+            setCalendarShow('');
         }else{
-            setShow('d-none');
+            setCalendarShow('d-none');
         }
     }
 
@@ -68,18 +77,18 @@ const Index = () => {
             }
 
         }catch(error){
-            console.error("checkId error");
-            return {props:{data:{code:'F500'}}};
+            alert('서버응답이 없습니다.')
         }
 
     }
 
     function checkPassword(password){
         setPassword1(password);
-        var regex  = /^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[`~!@#$%^&*\\(\\)\-_=+]).{8,20}$/g
 
-        const result = regex.test(password);        
-        if(result == true){
+        var regex  = /^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[`~!@#$%^&*\\(\\)\-_=+]).{8,20}$/g
+        const result = regex.test(password);
+
+        if(result == true && password.search(/\s/) == -1){
             setValidPassword(true);
         }else{
             setValidPassword(false);
@@ -91,12 +100,78 @@ const Index = () => {
         setEqualPassword(password1 == password);       
     }
 
-    function updateDate(date){
-        setDate(moment(value).format('YYYY-MM-DD'));
+    function updateBirthDay(date){
+        setBirthDay(moment(date).format('YYYY-MM-DD'));
         showCalendar();
     }
 
-    function join(){
+    function checkName(name){
+
+        setName(name);
+
+        if(name.search(/\s/) == -1){
+            setValidName(true);
+        }else{
+            setValidName(false);
+        }
+    }
+
+
+    async function join(){
+        if(!validId){
+            alert('아이디 중복확인을 해주세요.');
+            return;
+        }
+
+        if(password1 == '' || !validPassword){
+            alert('비밀번호를 형식에 맞게 입력해주세요.');
+            return;
+        }
+
+        if(password2 == '' || !equalPassword){
+            alert('비밀번호 한번 더 입력헤주세요.');
+            return;
+        }
+
+        if(name == '' || !validName){
+            alert('이름을 형식에 맞게 입력해주세요.');
+            return;
+        }
+
+        if(birthDay === ''){
+            alert('생일을 선택해주세요.');
+            return;
+        }
+
+        try{
+            const res = await fetch('http://localhost:8080/user/', {
+                method:'POST'
+                , headers:{
+                    'Content-Type':'application/json',
+                },
+                body:JSON.stringify({
+                    userId : id
+                    , password : crypto.createHash('sha256').update(password1).digest('hex')
+                    , name : name
+                    , birthDay : birthDay
+                })
+            });
+            
+            const data = await res.json();
+
+            if(data.code == "200"){
+                alert('회원가입이 성공했습니다.');
+                router.push({pathname:"/"});    
+            }else{
+                alert('회원가입 도중 문제가 발생하였습니다. : ' + data.code);
+            }
+
+        }catch(error){
+            console.log("error;");
+            console.log(error);
+            alert('서버응답이 없습니다.');            
+        }
+
     }
 
     return(
@@ -131,31 +206,34 @@ const Index = () => {
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="name">
-                                <Form.Control placeholder="이름"/>
+                                <Form.Control placeholder="이름" value={name} onChange={(event) => checkName(event.target.value)} isInvalid={!validName}/>
+                                <Form.Control.Feedback type="invalid">
+                                {'이름에 공백을 제거해주세요.'}
+                                </Form.Control.Feedback>                                
                             </Form.Group>
 
                             <InputGroup className="mb-3">
                                 <Form.Control 
                                     placeholder="생년월일"
-                                    value={date}
+                                    value={birthDay}
                                     readOnly
                                 />
                                 <Button variant="outline-secondary" onClick={()=>showCalendar()}>달력</Button>
                             </InputGroup>
 
-                            <Form.Group className={'position-relative mb-3 ' + show}>
+                            <Form.Group className={'position-relative mb-3 ' + calendarShow}>
                                 <Calendar 
                                     className='position-absolute start-50 translate-middle-x'
-                                    onChange={onChange} value={value} locale="ko"
+                                    onChange={setToday} value={today} locale="ko"
                                     formatDay={(locale, date) => moment(date).format("D")}
                                     formatMonth={(locale, date) => moment(date).format("M")}
                                     formatYear={(locale, date) => moment(date).format("YYYY")}
-                                    onClickDay={(value, event) => updateDate(value)}
+                                    onClickDay={(value, event) => updateBirthDay(value)}
                                     maxDate={new Date()}
                                     ></Calendar>
                             </Form.Group>
                             
-                            <Button type="button" onClick={join}>가입</Button>
+                            <Button onClick={join}>가입</Button>
                             
                         </Form>
                     </Col>
