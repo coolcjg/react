@@ -8,6 +8,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import crypto from "crypto"
 import Router, {useRouter} from 'next/router'
+import {setCookie} from 'cookies-next'
 
 const Index = () => {
 
@@ -42,7 +43,7 @@ const Index = () => {
         setValidPassword(true);
 
         try{
-            const res = await fetch('http://localhost:8080/user/login/', {
+            const res = await fetch('http://localhost:8080/user/login', {
                 method:'POST'
                 , headers:{
                     'Content-Type':'application/json',
@@ -60,7 +61,13 @@ const Index = () => {
 
             if(data.code == "200"){
                 alert('로그인이 성공했습니다.');
-                router.push({pathname:"/"});    
+
+                const token = res.headers.get('Set-Cookie');
+
+                setCookie('accessToken', data.accessToken);
+                setCookie('refreshToken', data.refreshToken);
+
+                router.push({pathname:"/"});
             }else{
                 alert('로그인중 문제가 발생하였습니다. : ' + data.code);
             }
