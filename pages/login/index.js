@@ -66,6 +66,8 @@ const Index = () => {
 
                 setCookie('accessToken', data.accessToken);
                 setCookie('refreshToken', data.refreshToken);
+                setCookie('id', data.id);
+                setCookie('name', data.name);
 
                 router.push({pathname:"/"});
             }else{
