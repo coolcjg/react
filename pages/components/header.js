@@ -11,11 +11,14 @@ import {useEffect, useState, useLayoutEffect} from 'react';
 
 const Header = () => {
 
+    const [loaded, setLoaded] = useState(false);
+
     const router = useRouter();
     const [id, setId] = useState("");
     const [name, setName] = useState("");
     
-    useLayoutEffect(()=>{
+    useEffect(()=>{
+        setLoaded(true);
 
         const id = getCookie("id");
         const name = getCookie("name");        
@@ -27,9 +30,16 @@ const Header = () => {
     function logout(){
         deleteCookie("id");
         deleteCookie("name");
+        deleteCookie("accessToken");
+        deleteCookie("refreshToken");        
+
         setId('');
         setName('');
         router.push({pathname:"/"});
+    }
+
+    if(!loaded){
+        return null;
     }
 
     return(
