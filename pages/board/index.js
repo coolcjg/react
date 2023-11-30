@@ -1,19 +1,41 @@
 import {useState} from 'react';
-import { useSearchParams } from "next/navigation";
 import Header from "../components/header";
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Table from 'react-bootstrap/Table';
+import Form from 'react-bootstrap/Form';
 
 
 const Index = ({data}) => {
 
-    console.log("data");
-    console.log(data);
+    console.log("Index");
+
 
     const [pageNumber, setPageNubmer] = useState(data.pageNumber);
     const [totalPage, setTotalPage] = useState(data.totalPage);
+    const [checkedId, setCheckedId] = useState([]);
+    
+    function checkAll(e){
+        if(e.target.checked){
+            const idArray = [];
+            data.boardList.forEach((el) => idArray.push(el.boardId));
+            setCheckedId(idArray);
+        }else{
+            setCheckedId([]);
+        }
+    }
+    
+    function check(id){
+
+        const isChecked = checkedId.includes(id);
+
+        if(isChecked){
+            setCheckedId((prev) => prev.filter((el) => el !== id));
+        }else{
+            setCheckedId((prev) => [...prev, id]);
+        }
+    }
 
     if(data.code == 200){
 
@@ -38,21 +60,21 @@ const Index = ({data}) => {
                         <Table striped bordered hover>
                         <thead>
                             <tr>
-                            <th></th>
-                            <th>제목</th>
-                            <th>작성자</th>
-                            <th>날짜</th>
-                            <th>조회수</th>
+                            <th style={{width:"0%"}}><Form.Check checked = {data.boardList.length == checkedId.length ? true : false} onChange={e => checkAll(e)}/></th>
+                            <th style={{width:"30%"}} className="text-center">제목</th>
+                            <th style={{width:"10%"}} className="text-center">작성자</th>
+                            <th style={{width:"10%"}} className="text-center">날짜</th>
+                            <th style={{width:"5%"}} className="text-center">조회수</th>
                             </tr>
                         </thead>
                         <tbody>
                             {data.boardList.map((board, index) =>(
                                 <tr key = {index}>
-                                <td></td>
+                                <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
                                 <td>{board.title}</td>
-                                <td>{board.user.userId}</td>
-                                <td>{board.regDate}</td>
-                                <td>{board.view}</td>
+                                <td className="text-center">{board.user.userId}</td>
+                                <td className="text-center">{board.regDate}</td>
+                                <td className="text-center">{board.view}</td>
                                 </tr>
                             ))
                             }
