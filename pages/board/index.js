@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
-
+import Button from 'react-bootstrap/Button'
 
 const Index = ({data}) => {
 
@@ -43,44 +43,46 @@ const Index = ({data}) => {
             <>
                 <Header></Header>
 
-                <Container fluid="md">
+                <Container fluid="md" className="mt-4">
 
                     <Row>
-                    <div>{pageNumber}/{totalPage}페이지</div>
-                    </Row>
-
-                    <Row>
-                        <div>
-
-                        </div>
+                        <Col>
+                            <div>{pageNumber}/{totalPage}페이지</div>  
+                        </Col>
                     </Row>
 
                     <Row>
                         <Col>
-                        <Table striped bordered hover>
-                        <thead>
-                            <tr>
-                            <th style={{width:"0%"}}><Form.Check checked = {data.boardList.length == checkedId.length ? true : false} onChange={e => checkAll(e)}/></th>
-                            <th style={{width:"30%"}} className="text-center">제목</th>
-                            <th style={{width:"10%"}} className="text-center">작성자</th>
-                            <th style={{width:"10%"}} className="text-center">날짜</th>
-                            <th style={{width:"5%"}} className="text-center">조회수</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.boardList.map((board, index) =>(
-                                <tr key = {index}>
-                                <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
-                                <td>{board.title}</td>
-                                <td className="text-center">{board.user.userId}</td>
-                                <td className="text-center">{board.regDate}</td>
-                                <td className="text-center">{board.view}</td>
+                            <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                <th style={{width:"0%"}}><Form.Check checked = {data.boardList.length == checkedId.length ? true : false} onChange={e => checkAll(e)}/></th>
+                                <th style={{width:"30%"}} className="text-center">제목</th>
+                                <th style={{width:"10%"}} className="text-center">작성자</th>
+                                <th style={{width:"10%"}} className="text-center">날짜</th>
+                                <th style={{width:"5%"}} className="text-center">조회수</th>
                                 </tr>
-                            ))
-                            }
+                            </thead>
+                            <tbody>
+                                {data.boardList.map((board, index) =>(
+                                    <tr key = {index}>
+                                    <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
+                                    <td>{board.title}</td>
+                                    <td className="text-center">{board.user.userId}</td>
+                                    <td className="text-center">{board.regDate}</td>
+                                    <td className="text-center">{board.view}</td>
+                                    </tr>
+                                ))
+                                }
 
-                        </tbody>
-                        </Table>
+                            </tbody>
+                            </Table>
+
+                            <div className="gap-2 d-md-flex justify-content-md-end">
+                                <Button size="sm">삭제</Button>
+                                <Button size="sm">글쓰기</Button>
+                            </div>
+
                         </Col>
                     </Row>
 
@@ -88,7 +90,7 @@ const Index = ({data}) => {
             </>
         )        
 
-    }else{
+    } else {
         return (
             <>
                 <Header></Header>
