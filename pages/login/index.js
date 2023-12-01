@@ -21,12 +21,26 @@ const Index = () => {
     const [validPassword, setValidPassword] = useState(true);    
 
     function changeId(id){
+        if(id != ''){
+            setValidId(true);
+        }
         setId(id.trim());
     }
 
     function checkPassword(password){
+        if(password != ''){
+            setValidPassword(true);
+        }        
         setPassword(password);
-    }    
+    }
+
+    function handleOnKeyUp(e){
+        if(e.key === 'Enter'){
+            login();
+        }
+    }
+
+
 
     async function login(){
 
@@ -100,7 +114,10 @@ const Index = () => {
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="password">
-                                <Form.Control type="password" placeholder="비밀번호" value={password} onChange={(event) => checkPassword(event.target.value)} isInvalid={!validPassword}/>
+                                <Form.Control type="password" placeholder="비밀번호" value={password} isInvalid={!validPassword}
+                                    onChange={(event) => checkPassword(event.target.value)} 
+                                    onKeyUp ={e => handleOnKeyUp(e)}
+                                    />
                                 <Form.Control.Feedback type="invalid">
                                 {'비밀번호를 입력하세요'}
                                 </Form.Control.Feedback>                                  

@@ -6,12 +6,14 @@ import Col from 'react-bootstrap/Col'
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
+import {useRouter} from 'next/router'
+import {getCookie, deleteCookie } from 'cookies-next'
 
 const Index = ({data}) => {
 
     console.log("Index");
 
-
+    const router = useRouter();
     const [pageNumber, setPageNubmer] = useState(data.pageNumber);
     const [totalPage, setTotalPage] = useState(data.totalPage);
     const [checkedId, setCheckedId] = useState([]);
@@ -35,6 +37,18 @@ const Index = ({data}) => {
         }else{
             setCheckedId((prev) => [...prev, id]);
         }
+    }
+
+    function goWrite(){
+
+        const id = getCookie("id");
+        
+        if(id === undefined){
+            router.push("/login");
+        }else{
+            router.push("/board/write");
+        }
+
     }
 
     if(data.code == 200){
@@ -80,7 +94,7 @@ const Index = ({data}) => {
 
                             <div className="gap-2 d-md-flex justify-content-md-end">
                                 <Button size="sm">삭제</Button>
-                                <Button size="sm">글쓰기</Button>
+                                <Button size="sm" onClick={()=> goWrite()}>글쓰기</Button>
                             </div>
 
                         </Col>
