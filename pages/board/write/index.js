@@ -25,7 +25,7 @@ const Index = () => {
 
     async function write(){
 
-        setUploading(true);
+        //setUploading(true);
 
         console.log("---------");
 
@@ -47,7 +47,10 @@ const Index = () => {
         
         try{       
             const res = await fetch("http://localhost:8080/board", {
-                method:'POST'
+                headers :{
+                    accessToken: getCookie("accessToken")
+                }
+                , method:'POST'
                 ,body : formData
             });
 
@@ -55,7 +58,7 @@ const Index = () => {
 
             if(res.ok == false){
                 alert("서버 에러 :" + res.status);
-                setUploading(false);
+                //setUploading(false);
             }
 
         }catch(error){
@@ -63,7 +66,7 @@ const Index = () => {
             console.log(error);
             alert('서버응답이 없습니다.');
 
-            setUploading(false);
+            //setUploading(false);
         }
 
     }
