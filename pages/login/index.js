@@ -74,8 +74,7 @@ const Index = () => {
             console.log(data);
 
             if(data.code == "200"){
-                alert('로그인이 성공했습니다.');
-
+                
                 const token = res.headers.get('Set-Cookie');
 
                 setCookie('accessToken', data.accessToken);

@@ -144,7 +144,7 @@ const Index = () => {
         }
 
         try{
-            const res = await fetch('http://localhost:8080/user/', {
+            const res = await fetch('http://localhost:8080/user', {
                 method:'POST'
                 , headers:{
                     'Content-Type':'application/json',

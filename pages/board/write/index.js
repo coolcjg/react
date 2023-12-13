@@ -1,13 +1,18 @@
 import {useState} from 'react';
 import Header from "../../components/header";
-import {getCookie, deleteCookie } from 'cookies-next'
+import {getCookie, setCookie, deleteCookie } from 'cookies-next'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
+import {useRouter} from 'next/router'
 
 const Index = () => {
+
+    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+
+    const router = useRouter();
 
     const [title, setTitle] = useState('11');
     const [region, setRegion] = useState('서울');
@@ -25,16 +30,7 @@ const Index = () => {
 
     async function write(){
 
-        //setUploading(true);
-
-        console.log("---------");
-
-
-        console.log("title : " + title);
-        console.log("region : " + region);
-        console.log("contents : " + contents);
-        console.log("files");
-        console.log(files);
+        setUploading(true);
 
         const formData = new FormData();
         formData.append("title", title);
@@ -46,29 +42,65 @@ const Index = () => {
         }
         
         try{       
-            const res = await fetch("http://localhost:8080/board", {
+            const res = await fetch(backServer + "/board", {
                 headers :{
                     accessToken: getCookie("accessToken")
+                    ,refreshToken: getCookie("refreshToken")
                 }
                 , method:'POST'
                 ,body : formData
             });
 
-            console.log(res);
+            const data = await res.json();
 
-            if(res.ok == false){
-                alert("서버 에러 :" + res.status);
-                //setUploading(false);
+            if(res.ok === true){
+                alert("게시물이 등록되었습니다");
+                router.push("/board");
+            }else{
+
+                if(data.message === "ExpiredJwtException"){
+                    console.log("ExpiredJwtException 체크");
+                    getAccessTokenByRefreshToken();
+                }else{
+                    alert('게시글 등록이 실패했습니다.');
+                    setUploading(false);   
+                }
             }
 
         }catch(error){
-            console.log("error");
             console.log(error);
             alert('서버응답이 없습니다.');
-
-            //setUploading(false);
+            setUploading(false);
         }
+    }
 
+    async function getAccessTokenByRefreshToken(){
+
+        console.log("getAccessTokenByRefreshToken");
+
+        try{       
+            const res = await fetch(backServer + "/jwt/accessToken", {
+                headers :{
+                    refreshToken: getCookie("refreshToken")
+                }
+                , method:'GET'
+            });
+
+            const data = await res.json();
+
+            if(data.status == 200){
+                setCookie("accessToken", data.accessToken);
+                write();
+            }else{
+                alert('로그인이 만료됐습니다.');
+                router.push("/login");                
+            }
+
+        }catch(error){
+            if(data.status == 401){
+                alert('서버응답이 없습니다.');
+            }
+        }
     }
 
     return(
