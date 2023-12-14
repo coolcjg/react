@@ -17,7 +17,8 @@ const Index = ({data}) => {
     const [pageNumber, setPageNubmer] = useState(data.pageNumber);
     const [totalPage, setTotalPage] = useState(data.totalPage);
     const [checkedId, setCheckedId] = useState([]);
-    
+    const [pagination, setPagination] = useState(data.pagination);
+
     function checkAll(e){
         if(e.target.checked){
             const idArray = [];
@@ -88,9 +89,14 @@ const Index = ({data}) => {
                                     </tr>
                                 ))
                                 }
-
                             </tbody>
                             </Table>
+
+                            {
+                                data.pagination.map((page, index) =>(
+                                    <a key={page}>{page}</a>
+                                ))    
+                            }
 
                             <div className="gap-2 d-md-flex justify-content-md-end">
                                 <Button size="sm">삭제</Button>
@@ -108,7 +114,7 @@ const Index = ({data}) => {
         return (
             <>
                 <Header></Header>
-                <div>에러 코드 : {data.code}</div>
+                <div>{data.message}</div>
             </>
         )         
 
@@ -130,9 +136,14 @@ export async function getServerSideProps(context){
 
         const res = await fetch('http://localhost:8080/board/list?pageNumber='+pageNumber);
         const data = await res.json();
+
+        console.log("getServerSideProps");
+        console.log(data);
+
+
         return {props:{data}}
     }catch(error){
-        return {props:{data:{code:'F500'}}};
+        return {props:{data:{code:'F500', message:'서버와 연결되지 않았습니다.'}}};
     }
 
     
