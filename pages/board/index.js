@@ -6,18 +6,21 @@ import Col from 'react-bootstrap/Col'
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
+import Pagination from 'react-bootstrap/Pagination'
 import {useRouter} from 'next/router'
 import {getCookie, deleteCookie } from 'cookies-next'
 
 const Index = ({data}) => {
 
-    console.log("Index");
-
     const router = useRouter();
-    const [pageNumber, setPageNubmer] = useState(data.pageNumber);
+
+    const [pageNumber, setPageNumber] = useState(data.pageNumber);
     const [totalPage, setTotalPage] = useState(data.totalPage);
-    const [checkedId, setCheckedId] = useState([]);
+    const [boardList, setBoardList] = useState(data.boardList);
+
     const [pagination, setPagination] = useState(data.pagination);
+
+    const [checkedId, setCheckedId] = useState([]);   
 
     function checkAll(e){
         if(e.target.checked){
@@ -52,13 +55,30 @@ const Index = ({data}) => {
 
     }
 
+    async function goList(pageNumber){
+
+        try{
+            const res = await fetch('http://localhost:8080/board/list?pageNumber='+pageNumber);
+            const data = await res.json();
+
+            setPageNumber(data.pageNumber);
+            setTotalPage(data.totalPage);
+            setBoardList(data.boardList);
+            setPagination(data.pagination);
+
+        }catch(error){
+            alert('서버 응답이 없습니다.');
+        }        
+
+    }
+
     if(data.code == 200){
 
         return (
             <>
                 <Header></Header>
 
-                <Container fluid="md" className="mt-4">
+                <Container fluid="md" className="mt-4 mb-4">
 
                     <Row>
                         <Col>
@@ -79,7 +99,7 @@ const Index = ({data}) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.boardList.map((board, index) =>(
+                                {boardList.map((board, index) =>(
                                     <tr key = {index}>
                                     <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
                                     <td>{board.title}</td>
@@ -92,13 +112,34 @@ const Index = ({data}) => {
                             </tbody>
                             </Table>
 
-                            {
-                                data.pagination.map((page, index) =>(
-                                    <a key={page}>{page}</a>
-                                ))    
-                            }
+                            <div className="d-flex justify-content-center">
+                            <Pagination>
+                                {
+                                    pageNumber >= 2 &&
+                                    <>
+                                    <Pagination.First onClick={(e)=>goList(1)}/>
+                                    <Pagination.Prev onClick={(e)=>goList(pageNumber-1)}/>
+                                    </>
+                                }
 
-                            <div className="gap-2 d-md-flex justify-content-md-end">
+                                {
+                                    pagination.map((page, index) =>(
+                                        <Pagination.Item key={page} active={page == pageNumber} onClick={(e) =>goList(page)}>{page}</Pagination.Item>
+                                    ))    
+                                }
+
+                                {
+                                    pageNumber != totalPage &&
+                                    <>
+                                        <Pagination.Next onClick={(e)=>goList(pageNumber+1)}/>
+                                        <Pagination.Last onClick={(e)=>goList(totalPage)}/>                                    
+                                    </>
+                                }
+
+                            </Pagination>
+                            </div>
+
+                            <div className="gap-2 d-flex justify-content-end">
                                 <Button size="sm">삭제</Button>
                                 <Button size="sm" onClick={()=> goWrite()}>글쓰기</Button>
                             </div>
@@ -132,14 +173,8 @@ export async function getServerSideProps(context){
             pageNumber = 1;
         }
 
-        console.log('http://localhost:8080/board/list?pageNumber='+pageNumber);
-
         const res = await fetch('http://localhost:8080/board/list?pageNumber='+pageNumber);
         const data = await res.json();
-
-        console.log("getServerSideProps");
-        console.log(data);
-
 
         return {props:{data}}
     }catch(error){
