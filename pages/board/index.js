@@ -9,6 +9,7 @@ import Button from 'react-bootstrap/Button'
 import Pagination from 'react-bootstrap/Pagination'
 import {useRouter} from 'next/router'
 import {getCookie, deleteCookie } from 'cookies-next'
+import Link from 'next/link';
 
 const Index = ({data}) => {
 
@@ -21,6 +22,8 @@ const Index = ({data}) => {
     const [pagination, setPagination] = useState(data.pagination);
 
     const [checkedId, setCheckedId] = useState([]);   
+
+    
 
     function checkAll(e){
         if(e.target.checked){
@@ -99,10 +102,10 @@ const Index = ({data}) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {boardList.map((board, index) =>(
+                                {boardList != undefined && boardList.map((board, index) =>(
                                     <tr key = {index}>
                                     <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
-                                    <td>{board.title}</td>
+                                    <td><Link href={"/board/" + board.boardId}>{board.title}</Link></td>
                                     <td className="text-center">{board.user.userId}</td>
                                     <td className="text-center">{board.regDate}</td>
                                     <td className="text-center">{board.view}</td>
@@ -140,8 +143,8 @@ const Index = ({data}) => {
                             </div>
 
                             <div className="gap-2 d-flex justify-content-end">
-                                <Button size="sm">삭제</Button>
-                                <Button size="sm" onClick={()=> goWrite()}>글쓰기</Button>
+                                <Button variant="outline-danger">삭제</Button>
+                                <Button variant="outline-primary" onClick={()=> goWrite()}>글쓰기</Button>
                             </div>
 
                         </Col>

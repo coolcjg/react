@@ -8,15 +8,19 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import {useRouter} from 'next/router'
 
-const Index = () => {
+const Index = ({data}) => {
+
+    console.log("data-----");
+    console.log(data);
 
     const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
 
     const router = useRouter();
 
-    const [title, setTitle] = useState('');
-    const [region, setRegion] = useState('');
-    const [contents, setContents] = useState('');
+    const [boardId, setBoardId] = useState(data.board.boardId);
+    const [title, setTitle] = useState(data.board.title);
+    const [region, setRegion] = useState(data.board.region);
+    const [contents, setContents] = useState(data.board.contents);
     const [files, setFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
 
@@ -28,7 +32,11 @@ const Index = () => {
 
     }
 
-    async function write(){
+    function list(){
+        router.push("/board");
+    }
+
+    async function modify(){
 
         setUploading(true);
 
@@ -47,22 +55,22 @@ const Index = () => {
                     accessToken: getCookie("accessToken")
                     ,refreshToken: getCookie("refreshToken")
                 }
-                , method:'POST'
+                , method:'PATCH'
                 ,body : formData
             });
 
             const data = await res.json();
 
             if(res.ok === true){
-                alert("게시물이 등록되었습니다");
-                router.push("/board");
+                alert("게시물이 수정되었습니다");
+                router.push("/board/" + boardId);
             }else{
 
                 if(data.message === "ExpiredJwtException"){
                     console.log("ExpiredJwtException 체크");
                     getAccessTokenByRefreshToken();
                 }else{
-                    alert('게시글 등록이 실패했습니다.');
+                    alert('게시글 수정이 실패했습니다.');
                     setUploading(false);   
                 }
             }
@@ -169,14 +177,33 @@ const Index = () => {
 
             </Form>
 
-            <div className="gap-2 d-md-flex justify-content-md-end">
-                <Button>목록</Button>
+            <div className="gap-2 d-flex justify-content-end">
+                <Button onClick={()=> list()}>목록</Button>
                 <Button variant="outline-primary" disabled={uploading} onClick={()=> write()}>등록</Button>
             </div>
 
         </Container>
         </>
     )
+
+}
+
+export async function getServerSideProps(context){
+
+    try{
+        let {boardId} = context.query;
+
+        const url = 'http://localhost:8080/board/'+boardId;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        console.log("서버단");
+        console.log(data);
+
+        return {props:{data}}
+    }catch(error){
+        return {props:{data:{code:'F500', message:'서버와 연결되지 않았습니다.'}}};
+    }
 
 }
 

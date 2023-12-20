@@ -31,7 +31,7 @@ const Header = () => {
         deleteCookie("id");
         deleteCookie("name");
         deleteCookie("accessToken");
-        deleteCookie("refreshToken");        
+        deleteCookie("refreshToken");
 
         setId('');
         setName('');
@@ -55,12 +55,12 @@ const Header = () => {
                         name ? (
                             <>
                             {name} 님
-                            <Button variant="outline-success" size="sm" className="mx-1" onClick={() => logout()}>로그아웃</Button>
+                            <Button variant="outline-danger" size="sm" className="mx-1" onClick={() => logout()}>로그아웃</Button>
                             </>
                         ) : (
                             <>
-                            <Button variant="outline-success" size="sm" className="mx-1" onClick={() => router.push({pathname:"/login"})}>로그인</Button>
-                            <Button variant="outline-success" size="sm" onClick={()=> router.push({pathname:"/join"})}>회원가입</Button>
+                            <Button variant="outline-primary" size="sm" className="mx-1" onClick={() => router.push({pathname:"/login"})}>로그인</Button>
+                            <Button variant="outline-primary" size="sm" onClick={()=> router.push({pathname:"/join"})}>회원가입</Button>
                             </>
                         )
                     }
