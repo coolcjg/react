@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import {useRouter} from 'next/router'
+import Card from 'react-bootstrap/Card';
 
 const Index = ({data}) => {
 
@@ -162,6 +163,28 @@ const Index = ({data}) => {
                     </Form.Label>
                     <Col sm={10}>
                         <Form.Control type="file" multiple onChange={(e) => fileChange(e)}/>
+                    </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} controlId="attachedFile" className="mb-3" >
+                    <Form.Label column sm={2}>
+                        첨부파일
+                    </Form.Label>
+                    <Col sm={10}>
+                        <Card style={{ width: '18rem' }}>
+
+                            <Card.Img variant="top" src="" />
+
+                            <Card.Body>
+                                <Card.Title>Card Title</Card.Title>
+                                <Card.Text>
+                                Some quick example text to build on the card title and make up the
+                                bulk of the card's content.
+                                </Card.Text>
+                                <Button variant="primary">삭제하기</Button>
+                            </Card.Body>
+                        </Card>                        
+                        
                     </Col>
                 </Form.Group>                
 

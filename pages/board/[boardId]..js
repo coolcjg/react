@@ -12,6 +12,7 @@ import {getCookie, deleteCookie } from 'cookies-next'
 import Link from 'next/link';
 import '../../public/css/Style.css'
 import { ListGroup } from 'react-bootstrap';
+import Carousel from 'react-bootstrap/Carousel';
 
 const Index = ({data}) => {
 
@@ -38,6 +39,22 @@ const Index = ({data}) => {
             <Header></Header>
 
             <Container fluid="md" className="mt-4 mb-4">
+
+                {board.mediaDTOList.length > 0 &&
+                    <Row className="mb-4">
+                        <div className="carouselDiv">
+                            <Carousel>
+                                {
+                                    board.mediaDTOList.map((media, index)=>(
+                                        <Carousel.Item>
+                                            <img className="carouselImg" src={media.originalFileUrl}/>
+                                        </Carousel.Item> 
+                                    ))
+                                }
+                            </Carousel>
+                        </div>
+                    </Row>
+                }
 
                 <Row>
                     <Col>

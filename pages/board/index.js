@@ -106,7 +106,7 @@ const Index = ({data}) => {
                                     <tr key = {index}>
                                     <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
                                     <td><Link href={"/board/" + board.boardId}>{board.title}</Link></td>
-                                    <td className="text-center">{board.user.userId}</td>
+                                    <td className="text-center">{board.userDTO.userId}</td>
                                     <td className="text-center">{board.regDate}</td>
                                     <td className="text-center">{board.view}</td>
                                     </tr>
