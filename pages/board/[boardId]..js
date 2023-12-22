@@ -39,21 +39,22 @@ const Index = ({data}) => {
             <Header></Header>
 
             <Container fluid="md" className="mt-4 mb-4">
-
-                {board.mediaDTOList.length > 0 &&
-                    <Row className="mb-4">
-                        <div className="carouselDiv">
-                            <Carousel>
-                                {
-                                    board.mediaDTOList.map((media, index)=>(
-                                        <Carousel.Item>
-                                            <img className="carouselImg" src={media.originalFileUrl}/>
-                                        </Carousel.Item> 
-                                    ))
-                                }
-                            </Carousel>
+                {board.mediaDTOList.length > 0 &&                    
+                    <div>
+                        <div className="mediaOut mb-4">
+                            <div className="mediaIn">
+                                <img className="" src={board.mediaDTOList[1].originalFileUrl}/>
+                            </div>
                         </div>
-                    </Row>
+
+                        <div>
+                            {
+                                board.mediaDTOList.map((media, index) => (
+                                    <div>{media.mediaId}</div>
+                                ))
+                            }
+                        </div>
+                    </div>
                 }
 
                 <Row>

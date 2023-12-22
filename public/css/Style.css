@@ -1,3 +1,12 @@
+:root{
+    --width-ratio:16;
+    --height-ratio:9;
+    --min-player-height:240px;
+    --min-player-width: calc(var(--min-player-height)*(var(--width-ratio)/var(--height-ratio)));    
+    --max-player-height: calc(100vh);
+    --max-player-width: calc((100vh)*(var(--width-ratio)/var(--height-ratio)));
+}
+
 th {
     text-align: center;
 }
@@ -10,17 +19,26 @@ th {
     white-space:pre-line
 }
 
-.carouselDiv{
-    height:720px;
+.mediaOut{
+    position:relative;
+    padding-top:calc(var(--height-ratio)/var(--width-ratio)*100%);
+    background-color:gray;
+    min-width:var(--min-player-width);
+    min-height:var(--min-player-height);
+    max-width:var(--max-player-width);
+    max-height:var(--max-player-height);
 }
 
-.carouselImg{
-    width:100%;
-    height:720px;
-    object-fit: contain;
-}
-
-.carousel-item{
-    background-color:#BDBDBD;
+.mediaIn{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
     text-align: center;
+}
+
+.mediaIn img{
+    height:100%;
+    object-fit:cover;
 }
