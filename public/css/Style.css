@@ -38,10 +38,16 @@ th {
     text-align: center;
 }
 
+.mediaIn video{
+    height:100%;
+    object-fit:cover;
+}
+
 .mediaIn img{
     height:100%;
     object-fit:cover;
 }
+
 
 .mediaThumbDiv{
     width:100%;

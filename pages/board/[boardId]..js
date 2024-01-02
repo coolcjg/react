@@ -24,7 +24,11 @@ const Index = ({data}) => {
     const router = useRouter();
     const {boardId} = router.query;
 
-    const [board, setBoard] = useState(data.board);    
+    const [board, setBoard] = useState(data.board);
+    const [mainMedia, setMainMedia] = useState(data.board.mediaDTOList[0]);
+    
+    console.log("board");
+    console.log(board);
 
     function list(){
         router.push("/board");
@@ -43,7 +47,10 @@ const Index = ({data}) => {
                     <div className="mb-5">
                         <div className="mediaOut mb-4">
                             <div className="mediaIn">
-                                <img className="" src={board.mediaDTOList[1].originalFileUrl}/>
+                                {
+                                    mainMedia.type === 'video' &&
+                                        <video controls src={mainMedia.encodingFileUrl}></video>
+                                }
                             </div>
                         </div>
 
