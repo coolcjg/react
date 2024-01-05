@@ -28,6 +28,10 @@ const Index = () => {
 
     }
 
+    function list(){
+        router.push("/board");
+    }    
+
     async function write(){
 
         setUploading(true);
@@ -170,7 +174,7 @@ const Index = () => {
             </Form>
 
             <div className="gap-2 d-md-flex justify-content-md-end">
-                <Button>목록</Button>
+                <Button variant="outline-secondary" onClick={()=> list()}>목록</Button>
                 <Button variant="outline-primary" disabled={uploading} onClick={()=> write()}>등록</Button>
             </div>
 

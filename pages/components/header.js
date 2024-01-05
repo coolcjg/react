@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button'
 import Router, {useRouter} from 'next/router'
 import {getCookie, deleteCookie } from 'cookies-next'
 import {useEffect, useState, useLayoutEffect} from 'react';
+import '../../public/css/Style.css'
 
 const Header = () => {
 

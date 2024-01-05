@@ -10,7 +10,6 @@ import Pagination from 'react-bootstrap/Pagination'
 import {useRouter} from 'next/router'
 import {getCookie, deleteCookie } from 'cookies-next'
 import Link from 'next/link';
-import '../../public/css/Style.css'
 import { ListGroup } from 'react-bootstrap';
 import Carousel from 'react-bootstrap/Carousel';
 import Spinner from 'react-bootstrap/Spinner';

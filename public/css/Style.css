@@ -82,6 +82,16 @@ th {
     max-height:100%;    
 }
 
+.search-wrap {
+    display: flex;
+    justify-content : center;
+}
+
+.search-wrap div{
+    display: inline-block;
+    margin-right:5px;
+}
+
 @media (min-width: 1400px){
     .container{
         max-width:1200px;

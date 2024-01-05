@@ -21,9 +21,9 @@ const Index = ({data}) => {
 
     const [pagination, setPagination] = useState(data.pagination);
 
-    const [checkedId, setCheckedId] = useState([]);   
+    const [checkedId, setCheckedId] = useState([]);
 
-    
+    const [searchParam, setSearchParam] = useState({searchType:"all", searchText:""});
 
     function checkAll(e){
         if(e.target.checked){
@@ -55,6 +55,29 @@ const Index = ({data}) => {
         }else{
             router.push("/board/write");
         }
+
+    }
+
+    async function search(){
+
+        console.log("searchParam");
+        console.log(searchParam);
+        
+        /*
+        try{
+            const param = 'searchType=' + searchParam.searchType + '&searchText=' + searchParam.searchText;
+            const res = await fetch('http://localhost:8080/board/list?' + param);
+            const data = await res.json();
+
+            setPageNumber(data.pageNumber);
+            setTotalPage(data.totalPage);
+            setBoardList(data.boardList);
+            setPagination(data.pagination);
+
+        }catch(error){
+            alert('서버 응답이 없습니다.');
+        }
+        */
 
     }
 
@@ -92,54 +115,82 @@ const Index = ({data}) => {
                     <Row>
                         <Col>
                             <Table striped bordered hover>
-                            <thead>
-                                <tr>
-                                <th style={{width:"0%"}}><Form.Check checked = {data.boardList.length == checkedId.length ? true : false} onChange={e => checkAll(e)}/></th>
-                                <th style={{width:"30%"}} className="text-center">제목</th>
-                                <th style={{width:"10%"}} className="text-center">작성자</th>
-                                <th style={{width:"10%"}} className="text-center">날짜</th>
-                                <th style={{width:"5%"}} className="text-center">조회수</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {boardList != undefined && boardList.map((board, index) =>(
-                                    <tr key = {index}>
-                                    <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
-                                    <td><Link href={"/board/" + board.boardId}>{board.title}</Link></td>
-                                    <td className="text-center">{board.userDTO.userId}</td>
-                                    <td className="text-center">{board.regDate}</td>
-                                    <td className="text-center">{board.view}</td>
+                                <thead>
+                                    <tr>
+                                    <th style={{width:"0%"}}><Form.Check checked = {data.boardList.length == checkedId.length ? true : false} onChange={e => checkAll(e)}/></th>
+                                    <th style={{width:"30%"}} className="text-center">제목</th>
+                                    <th style={{width:"5%"}} className="text-center">지역</th>
+                                    <th style={{width:"10%"}} className="text-center">작성자</th>
+                                    <th style={{width:"10%"}} className="text-center">날짜</th>
+                                    <th style={{width:"5%"}} className="text-center">조회수</th>
                                     </tr>
-                                ))
-                                }
-                            </tbody>
+                                </thead>
+                                <tbody>
+                                    {boardList != undefined && boardList.map((board, index) =>(
+                                        <tr key = {index}>
+                                        <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
+                                        <td><Link style={{ textDecoration: 'none' }} href={"/board/" + board.boardId}>{board.title}</Link></td>
+                                        <td>{board.region}</td>
+                                        <td className="text-center">{board.userDTO.userId}</td>
+                                        <td className="text-center">{board.regDate}</td>
+                                        <td className="text-center">{board.view}</td>
+                                        </tr>
+                                    ))
+                                    }
+                                </tbody>
                             </Table>
 
+
+                            <div className="justify-content-center mb-3 search-wrap">
+                                <div>
+                                    <Form.Select value={searchParam.searchType} onChange={(e)=>setSearchParam({...searchParam, searchType:e.target.value})}>
+                                        <option value="all">전체</option>
+                                        <option value="title">제목</option>
+                                        <option value="region">지역</option>
+                                        <option value="userId">작성자</option>
+                                        <option value="regDate">날짜</option>
+                                    </Form.Select>
+                                </div>
+                                
+                                <div>
+                                    <Form.Group controlId="text">
+                                        <Form.Control type="text" placeholder="검색어" value={searchParam.searchText} onChange={(e) => setSearchParam({...searchParam, searchText:e.target.value})}/>
+                                    </Form.Group>                                
+                                </div>
+
+                                <div>
+                                    <Button variant="outline-secondary" onClick={()=> search()}>검색</Button>
+                                </div>
+                            </div>
+
+
+
+
                             <div className="d-flex justify-content-center">
-                            <Pagination>
-                                {
-                                    pageNumber >= 2 &&
-                                    <>
-                                    <Pagination.First onClick={(e)=>goList(1)}/>
-                                    <Pagination.Prev onClick={(e)=>goList(pageNumber-1)}/>
-                                    </>
-                                }
+                                <Pagination>
+                                    {
+                                        pageNumber >= 2 &&
+                                        <>
+                                        <Pagination.First onClick={(e)=>goList(1)}/>
+                                        <Pagination.Prev onClick={(e)=>goList(pageNumber-1)}/>
+                                        </>
+                                    }
 
-                                {
-                                    pagination.map((page, index) =>(
-                                        <Pagination.Item key={page} active={page == pageNumber} onClick={(e) =>goList(page)}>{page}</Pagination.Item>
-                                    ))    
-                                }
+                                    {
+                                        pagination.map((page, index) =>(
+                                            <Pagination.Item key={page} active={page == pageNumber} onClick={(e) =>goList(page)}>{page}</Pagination.Item>
+                                        ))    
+                                    }
 
-                                {
-                                    pageNumber != totalPage &&
-                                    <>
-                                        <Pagination.Next onClick={(e)=>goList(pageNumber+1)}/>
-                                        <Pagination.Last onClick={(e)=>goList(totalPage)}/>                                    
-                                    </>
-                                }
+                                    {
+                                        pageNumber != totalPage &&
+                                        <>
+                                            <Pagination.Next onClick={(e)=>goList(pageNumber+1)}/>
+                                            <Pagination.Last onClick={(e)=>goList(totalPage)}/>                                    
+                                        </>
+                                    }
 
-                            </Pagination>
+                                </Pagination>
                             </div>
 
                             <div className="gap-2 d-flex justify-content-end">
