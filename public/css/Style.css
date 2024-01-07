@@ -92,6 +92,11 @@ th {
     margin-right:5px;
 }
 
+.search-wrap .searchText{
+    width:210px;
+}
+
+
 @media (min-width: 1400px){
     .container{
         max-width:1200px;

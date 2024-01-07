@@ -10,6 +10,12 @@ import Pagination from 'react-bootstrap/Pagination'
 import {useRouter} from 'next/router'
 import {getCookie, deleteCookie } from 'cookies-next'
 import Link from 'next/link';
+import {Calendar} from 'react-date-range'
+import { DateRange  } from 'react-date-range';
+import { format } from "date-fns"
+
+import 'react-date-range/dist/styles.css'; 
+import 'react-date-range/dist/theme/default.css'; 
 
 const Index = ({data}) => {
 
@@ -24,6 +30,8 @@ const Index = ({data}) => {
     const [checkedId, setCheckedId] = useState([]);
 
     const [searchParam, setSearchParam] = useState({searchType:"all", searchText:""});
+    
+    const [showCalendar, setShowCalendar] = useState(false);
 
     function checkAll(e){
         if(e.target.checked){
@@ -94,6 +102,32 @@ const Index = ({data}) => {
 
     }
 
+    function changeSearchType(e){
+        setSearchParam({...searchParam, searchType:e.target.value});
+        setShowCalendar(e.target.value === 'regDate');
+        
+    }    
+
+    const [state, setState] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection',
+        }  
+    ])
+
+    function changeDate(item){
+        setState([item.selection]);
+        const dateRangeText = format(item.selection.startDate, "yyyy-MM-dd") + "~" + format(item.selection.endDate, "yyyy-MM-dd");
+        setSearchParam({...searchParam, searchText:dateRangeText});
+    }
+
+    function searchFocus(){
+        if(searchParam.searchType === 'regDate'){
+            setShowCalendar(true);
+        }
+    }
+
     if(data.code == 200){
 
         return (
@@ -139,7 +173,7 @@ const Index = ({data}) => {
 
                             <div className="justify-content-center mb-3 search-wrap">
                                 <div>
-                                    <Form.Select value={searchParam.searchType} onChange={(e)=>setSearchParam({...searchParam, searchType:e.target.value})}>
+                                    <Form.Select value={searchParam.searchType} onChange={(e)=>changeSearchType(e)}>
                                         <option value="all">전체</option>
                                         <option value="title">제목</option>
                                         <option value="region">지역</option>
@@ -148,9 +182,9 @@ const Index = ({data}) => {
                                     </Form.Select>
                                 </div>
                                 
-                                <div>
-                                    <Form.Group controlId="text">
-                                        <Form.Control type="text" placeholder="검색어" value={searchParam.searchText} onChange={(e) => setSearchParam({...searchParam, searchText:e.target.value})}/>
+                                <div className="">
+                                    <Form.Group className="searchText">
+                                        <Form.Control type="text" placeholder="검색어" value={searchParam.searchText} onFocus={(e) => searchFocus()} onChange={(e) => setSearchParam({...searchParam, searchText:e.target.value})}/>
                                     </Form.Group>                                
                                 </div>
 
@@ -159,8 +193,17 @@ const Index = ({data}) => {
                                 </div>
                             </div>
 
-
-
+                            <div className={"d-flex justify-content-center " + (showCalendar ? "" : "d-none")}>
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={(item) => changeDate(item)}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={state}
+                                />
+                                <div>
+                                    <Button variant="outline-secondary" onClick={()=> setShowCalendar(false)}>닫기</Button>
+                                </div>                                
+                            </div>
 
                             <div className="d-flex justify-content-center">
                                 <Pagination>
