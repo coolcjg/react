@@ -59,11 +59,7 @@ const Index = ({data}) => {
     }
 
     async function search(){
-
-        console.log("searchParam");
-        console.log(searchParam);
         
-        /*
         try{
             const param = 'searchType=' + searchParam.searchType + '&searchText=' + searchParam.searchText;
             const res = await fetch('http://localhost:8080/board/list?' + param);
@@ -77,14 +73,14 @@ const Index = ({data}) => {
         }catch(error){
             alert('서버 응답이 없습니다.');
         }
-        */
 
     }
 
     async function goList(pageNumber){
 
         try{
-            const res = await fetch('http://localhost:8080/board/list?pageNumber='+pageNumber);
+            const param = 'pageNumber=' + pageNumber + '&searchType=' + searchParam.searchType + '&searchText=' + searchParam.searchText;
+            const res = await fetch('http://localhost:8080/board/list?' + param);
             const data = await res.json();
 
             setPageNumber(data.pageNumber);
