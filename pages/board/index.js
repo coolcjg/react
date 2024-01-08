@@ -13,6 +13,7 @@ import Link from 'next/link';
 import {Calendar} from 'react-date-range'
 import { DateRange  } from 'react-date-range';
 import { format } from "date-fns"
+import CloseButton from 'react-bootstrap/CloseButton';
 
 import 'react-date-range/dist/styles.css'; 
 import 'react-date-range/dist/theme/default.css'; 
@@ -144,31 +145,53 @@ const Index = ({data}) => {
 
                     <Row>
                         <Col>
-                            <Table striped bordered hover>
-                                <thead>
-                                    <tr>
-                                    <th style={{width:"0%"}}><Form.Check checked = {data.boardList.length == checkedId.length ? true : false} onChange={e => checkAll(e)}/></th>
-                                    <th style={{width:"30%"}} className="text-center">제목</th>
-                                    <th style={{width:"5%"}} className="text-center">지역</th>
-                                    <th style={{width:"10%"}} className="text-center">작성자</th>
-                                    <th style={{width:"10%"}} className="text-center">날짜</th>
-                                    <th style={{width:"5%"}} className="text-center">조회수</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {boardList != undefined && boardList.map((board, index) =>(
-                                        <tr key = {index}>
-                                        <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
-                                        <td><Link style={{ textDecoration: 'none' }} href={"/board/" + board.boardId}>{board.title}</Link></td>
-                                        <td>{board.region}</td>
-                                        <td className="text-center">{board.userDTO.userId}</td>
-                                        <td className="text-center">{board.regDate}</td>
-                                        <td className="text-center">{board.view}</td>
-                                        </tr>
-                                    ))
-                                    }
-                                </tbody>
-                            </Table>
+                            <div className="p-relative">
+                                <div className="boardTable">
+                                    <Table striped bordered hover>
+                                        <thead>
+                                            <tr>
+                                            <th style={{width:"0%"}}><Form.Check checked = {data.boardList.length == checkedId.length ? true : false} onChange={e => checkAll(e)}/></th>
+                                            <th style={{width:"30%"}} className="text-center">제목</th>
+                                            <th style={{width:"5%"}} className="text-center">지역</th>
+                                            <th style={{width:"10%"}} className="text-center">작성자</th>
+                                            <th style={{width:"10%"}} className="text-center">날짜</th>
+                                            <th style={{width:"5%"}} className="text-center">조회수</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {boardList.length > 0 && boardList.map((board, index) =>(
+                                                <tr key = {index}>
+                                                <td><Form.Check value={board.boardId} checked={checkedId.includes(board.boardId) ? true : false} onChange={(e)=>check(board.boardId)}/></td>
+                                                <td><Link style={{ textDecoration: 'none' }} href={"/board/" + board.boardId}>{board.title}</Link></td>
+                                                <td>{board.region}</td>
+                                                <td className="text-center">{board.userDTO.userId}</td>
+                                                <td className="text-center">{board.regDate}</td>
+                                                <td className="text-center">{board.view}</td>
+                                                </tr>
+                                            ))
+                                            }
+                                            {boardList.length == 0 &&
+                                                <tr>
+                                                    <td className="td-empty text-center" colSpan={6}>검색 결과가 없습니다.</td>
+                                                </tr>
+                                            }
+
+                                        </tbody>    
+                                    </Table>
+                                </div>
+
+                                <div className={"searchCalendar  justify-content-center " + (showCalendar ? "" : "d-none")}>
+                                    <div className="close">
+                                        <CloseButton onClick={()=> setShowCalendar(false)}/>
+                                    </div>                                    
+                                    <DateRange
+                                        editableDateInputs={true}
+                                        onChange={(item) => changeDate(item)}
+                                        moveRangeOnFirstSelection={false}
+                                        ranges={state}
+                                    />
+                                </div>
+                            </div>
 
 
                             <div className="justify-content-center mb-3 search-wrap">
@@ -191,18 +214,6 @@ const Index = ({data}) => {
                                 <div>
                                     <Button variant="outline-secondary" onClick={()=> search()}>검색</Button>
                                 </div>
-                            </div>
-
-                            <div className={"d-flex justify-content-center " + (showCalendar ? "" : "d-none")}>
-                                <DateRange
-                                    editableDateInputs={true}
-                                    onChange={(item) => changeDate(item)}
-                                    moveRangeOnFirstSelection={false}
-                                    ranges={state}
-                                />
-                                <div>
-                                    <Button variant="outline-secondary" onClick={()=> setShowCalendar(false)}>닫기</Button>
-                                </div>                                
                             </div>
 
                             <div className="d-flex justify-content-center">

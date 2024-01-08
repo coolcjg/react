@@ -96,6 +96,32 @@ th {
     width:210px;
 }
 
+.p-relative {
+    position:relative;
+}
+
+.searchCalendar{
+    position:absolute;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    background-color:white;
+    border:1px solid #BDBDBD;
+}
+
+.searchCalendar .close{
+    text-align: right
+}
+
+.boardTable{
+    min-height:460px;
+}
+
+.td-empty {
+    vertical-align: middle;
+}
+
+
 
 @media (min-width: 1400px){
     .container{
