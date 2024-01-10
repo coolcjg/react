@@ -10,7 +10,7 @@ import crypto from "crypto"
 import Router, {useRouter} from 'next/router'
 import {setCookie} from 'cookies-next'
 
-const Index = () => {
+const Index = () => { 
 
     const router = useRouter(); 
 
