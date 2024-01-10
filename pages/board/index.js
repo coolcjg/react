@@ -20,6 +20,8 @@ import 'react-date-range/dist/theme/default.css';
 
 const Index = ({data}) => {
 
+    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+
     const router = useRouter(); 
 
     const [pageNumber, setPageNumber] = useState(data.pageNumber);
@@ -129,6 +131,25 @@ const Index = ({data}) => {
         }
     }
 
+    async function deleteBoard(){
+
+        const bodyParam = {boardIdArray : JSON.stringify(checkedId)};
+        console.log("bodyParam");
+        console.log(bodyParam);
+        
+        const res = await fetch(backServer + "/board", {
+            headers :{
+                accessToken: getCookie("accessToken")
+                ,refreshToken: getCookie("refreshToken")
+            }
+            , method:'DELETE'
+            ,body : JSON.stringify(bodyParam)
+        });
+
+        const data = await res.json();
+
+    }
+
     if(data.code == 200){
 
         return (
@@ -150,7 +171,7 @@ const Index = ({data}) => {
                                     <Table striped bordered hover>
                                         <thead>
                                             <tr>
-                                            <th style={{width:"0%"}}><Form.Check checked = {data.boardList.length == checkedId.length ? true : false} onChange={e => checkAll(e)}/></th>
+                                            <th style={{width:"0%"}}><Form.Check checked = {data.boardList.length == checkedId.length && checkedId.length > 0  ? true : false} onChange={e => checkAll(e)}/></th>
                                             <th style={{width:"30%"}} className="text-center">제목</th>
                                             <th style={{width:"5%"}} className="text-center">지역</th>
                                             <th style={{width:"10%"}} className="text-center">작성자</th>
@@ -244,7 +265,7 @@ const Index = ({data}) => {
                             </div>
 
                             <div className="gap-2 d-flex justify-content-end">
-                                <Button variant="outline-danger">삭제</Button>
+                                <Button variant="outline-danger" onClick={() => deleteBoard()}>삭제</Button>
                                 <Button variant="outline-primary" onClick={()=> goWrite()}>글쓰기</Button>
                             </div>
 
