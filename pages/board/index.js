@@ -20,7 +20,7 @@ import 'react-date-range/dist/theme/default.css';
 
 const Index = ({data}) => {
 
-    const router = useRouter();
+    const router = useRouter(); 
 
     const [pageNumber, setPageNumber] = useState(data.pageNumber);
     const [totalPage, setTotalPage] = useState(data.totalPage);
