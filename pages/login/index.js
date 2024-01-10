@@ -12,7 +12,7 @@ import {setCookie} from 'cookies-next'
 
 const Index = () => {
 
-    const router = useRouter();
+    const router = useRouter(); 
 
     const [id, setId] = useState('');
     const [validId, setValidId] = useState(true);
