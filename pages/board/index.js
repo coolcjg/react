@@ -80,6 +80,7 @@ const Index = ({data}) => {
             setTotalPage(data.totalPage);
             setBoardList(data.boardList);
             setPagination(data.pagination);
+            setShowCalendar(false);
 
         }catch(error){
             alert('서버 응답이 없습니다.');
@@ -133,21 +134,32 @@ const Index = ({data}) => {
 
     async function deleteBoard(){
 
-        const bodyParam = {boardIdArray : JSON.stringify(checkedId)};
-        console.log("bodyParam");
-        console.log(bodyParam);
-        
+        let boardIdArray = "";
+        for(let i=0; i<checkedId.length; i++ ){
+            if(boardIdArray === ""){
+                boardIdArray += checkedId[i];
+            }else{
+                boardIdArray += ("," + checkedId[i]);
+            }
+        }
+
+        const bodyParam = {boardIdArray : boardIdArray};        
         const res = await fetch(backServer + "/board", {
             headers :{
                 accessToken: getCookie("accessToken")
                 ,refreshToken: getCookie("refreshToken")
+                ,'Content-Type':'application/json'
             }
             , method:'DELETE'
             ,body : JSON.stringify(bodyParam)
         });
 
         const data = await res.json();
-
+        if(data.status == 200){
+            alert('게시글이 삭제됐습니다.');
+            router.reload();
+        }
+        
     }
 
     if(data.code == 200){
