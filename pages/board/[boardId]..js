@@ -52,6 +52,10 @@ const Index = ({data}) => {
                                         <video controls src={mainMedia.encodingFileUrl}></video>
                                 }
                                 {
+                                    mainMedia.type === 'audio' &&
+                                        <audio controls src={mainMedia.encodingFileUrl}></audio>
+                                }
+                                {
                                     mainMedia.type === 'image' &&
                                         <img src={mainMedia.encodingFileUrl}></img>
                                 }   

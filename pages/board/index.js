@@ -134,6 +134,15 @@ const Index = ({data}) => {
 
     async function deleteBoard(){
 
+        if(checkedId.length == 0){
+            alert('선택된 게시글이 없습니다.');
+            return;
+        }
+
+        if(!confirm('삭제하시겠습니까?')){
+            return;
+        }
+
         let boardIdArray = "";
         for(let i=0; i<checkedId.length; i++ ){
             if(boardIdArray === ""){

@@ -9,6 +9,8 @@ import Form from 'react-bootstrap/Form';
 import {useRouter} from 'next/router'
 import Card from 'react-bootstrap/Card';
 
+
+
 const Index = ({data}) => {
 
     console.log("data-----");
@@ -24,6 +26,7 @@ const Index = ({data}) => {
     const [contents, setContents] = useState(data.board.contents);
     const [files, setFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
+    const [board, setBoard] = useState(data.board);
 
     function fileChange(e){
 
@@ -81,6 +84,55 @@ const Index = ({data}) => {
             alert('서버응답이 없습니다.');
             setUploading(false);
         }
+    }
+
+    async function deleteMedia(mediaId){
+        console.log(mediaId);
+
+        console.log(board.mediaDTOList);
+        const newMediaList = board.mediaDTOList.filter(media => media.mediaId != mediaId)
+        console.log(newMediaList);                   
+        
+        setBoard({...board, mediaDTOList:newMediaList});
+        console.log(board);
+
+        /*
+        try{       
+            const res = await fetch(backServer + "/board" + mediaId, {
+                headers :{
+                    accessToken: getCookie("accessToken")
+                    ,refreshToken: getCookie("refreshToken")
+                }
+                , method:'DELETE'
+            });
+
+            const data = await res.json();
+
+            if(res.ok === true){
+                alert("미디어가 삭제되었습니다");
+
+                console.log(board.mediaDTOList);
+                const newMediaList = board.mediaDTOList.filter(media => media.mediaId != mediaId)
+                console.log(newMediaList);                   
+
+                setBoard(...board, {mediaDTOList:newMediaList});
+
+            }else{
+                if(data.message === "ExpiredJwtException"){
+                    console.log("ExpiredJwtException 체크");
+                    alert('다시 로그인해주세요.');
+                }else{
+                    alert('게시글 수정이 실패했습니다.');
+                }
+            }
+
+        }catch(error){
+            console.log(error);
+            alert('서버응답이 없습니다.');
+        }    
+        */
+
+
     }
 
     async function getAccessTokenByRefreshToken(){
@@ -170,21 +222,21 @@ const Index = ({data}) => {
                     <Form.Label column sm={2}>
                         첨부파일
                     </Form.Label>
-                    <Col sm={10}>
-                        <Card style={{ width: '18rem' }}>
+                    <Col sm={10} className="cardDiv">
+                        {
+                            board.mediaDTOList.map((media, index) =>
+                                <div className="card" key={media.mediaId}>
+                                    <div className="cardImgDiv">
+                                        <img src={media.thumbnailImgUrl} className="card-img-top"/>
+                                    </div>
+                                    <div className="card-body">
+                                        <p className="card-title">{media.originalFileClientName}</p>
+                                        <a href="#" onClick={()=> deleteMedia(media.mediaId)} className="btn btn-primary btn-sm">삭제</a>
+                                    </div>
+                                </div>
+                            )
+                        }                                                       
 
-                            <Card.Img variant="top" src="" />
-
-                            <Card.Body>
-                                <Card.Title>Card Title</Card.Title>
-                                <Card.Text>
-                                Some quick example text to build on the card title and make up the
-                                bulk of the card's content.
-                                </Card.Text>
-                                <Button variant="primary">삭제하기</Button>
-                            </Card.Body>
-                        </Card>                        
-                        
                     </Col>
                 </Form.Group>                
 
