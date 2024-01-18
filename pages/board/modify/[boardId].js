@@ -88,17 +88,10 @@ const Index = ({data}) => {
 
     async function deleteMedia(mediaId){
         console.log(mediaId);
-
         console.log(board.mediaDTOList);
-        const newMediaList = board.mediaDTOList.filter(media => media.mediaId != mediaId)
-        console.log(newMediaList);                   
         
-        setBoard({...board, mediaDTOList:newMediaList});
-        console.log(board);
-
-        /*
         try{       
-            const res = await fetch(backServer + "/board" + mediaId, {
+            const res = await fetch(backServer + "/media/" + mediaId, {
                 headers :{
                     accessToken: getCookie("accessToken")
                     ,refreshToken: getCookie("refreshToken")
@@ -107,32 +100,28 @@ const Index = ({data}) => {
             });
 
             const data = await res.json();
+            console.log(res);
+            console.log("data----");
+            console.log(data);
 
-            if(res.ok === true){
+            if(data.code === 200){
                 alert("미디어가 삭제되었습니다");
-
-                console.log(board.mediaDTOList);
                 const newMediaList = board.mediaDTOList.filter(media => media.mediaId != mediaId)
-                console.log(newMediaList);                   
-
-                setBoard(...board, {mediaDTOList:newMediaList});
-
+                setBoard({...board, mediaDTOList:newMediaList});
             }else{
                 if(data.message === "ExpiredJwtException"){
                     console.log("ExpiredJwtException 체크");
-                    alert('다시 로그인해주세요.');
+                    alert('로그인이 만료되었습니다.');
+                    router.push('/login');
                 }else{
                     alert('게시글 수정이 실패했습니다.');
                 }
             }
 
         }catch(error){
-            console.log(error);
-            alert('서버응답이 없습니다.');
+            console.error(error);
+            alert('오류가 발생하였습니다.');
         }    
-        */
-
-
     }
 
     async function getAccessTokenByRefreshToken(){

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import Header from "../components/header";
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
@@ -17,6 +17,21 @@ import Spinner from 'react-bootstrap/Spinner';
 const Index = ({data}) => {
 
     const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+
+    const [id, setId] = useState("");
+    const [name, setName] = useState("");    
+
+    useEffect(()=>{
+        const id = getCookie("id");
+        const name = getCookie("name");
+
+        if(id != undefined){
+            setId(id);
+            setName(name);
+        }
+
+    }, []);        
+
 
     console.log("프론트 data");
     console.log(data);
@@ -82,7 +97,7 @@ const Index = ({data}) => {
                                             media.type === 'audio' &&
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-music-note-beamed" viewBox="0 0 16 16">
                                                 <path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2m9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2"/>
-                                                <path fill-rule="evenodd" d="M14 11V2h1v9zM6 3v10H5V3z"/>
+                                                <path fillRule="evenodd" d="M14 11V2h1v9zM6 3v10H5V3z"/>
                                                 <path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4z"/>
                                                 </svg>
                                         }
@@ -148,7 +163,10 @@ const Index = ({data}) => {
                     <Col>
                         <div className="gap-2 d-flex justify-content-end">
                             <Button variant="outline-secondary" onClick={()=> list()}>목록</Button>
-                            <Button variant="outline-success" onClick={()=> modify(board.boardId)}>수정</Button>
+                            {
+                                (id != "" && id == board.userDTO.userId) &&
+                                <Button variant="outline-success" onClick={()=> modify(board.boardId)}>수정</Button>
+                            }
                         </div>                                        
                     </Col>
                 </Row>
