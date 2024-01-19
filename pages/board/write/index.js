@@ -34,9 +34,20 @@ const Index = () => {
 
     async function write(){
 
+        if(title.trim() === ""){
+            alert('제목을 입력해주세요.');
+            return;
+        }
+
+        if(region.trim() === ""){
+            alert('지역을 선택해주세요.');
+            return;
+        }        
+
         setUploading(true);
 
         const formData = new FormData();
+
         formData.append("title", title);
         formData.append("region", region);
         formData.append("contents", contents);
@@ -63,7 +74,7 @@ const Index = () => {
             }else{
 
                 if(data.message === "ExpiredJwtException"){
-                    console.log("ExpiredJwtException 체크");
+                    console.log("ExpiredJwtException");
                     getAccessTokenByRefreshToken();
                 }else{
                     alert('게시글 등록이 실패했습니다.');
