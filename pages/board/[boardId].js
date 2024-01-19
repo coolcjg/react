@@ -19,7 +19,7 @@ const Index = ({data}) => {
     const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
 
     const [id, setId] = useState("");
-    const [name, setName] = useState("");    
+    const [name, setName] = useState("");
 
     useEffect(()=>{
         const id = getCookie("id");
@@ -46,27 +46,13 @@ const Index = ({data}) => {
         router.push("/board/modify/" + boardId);
     }
 
-    async function deleteBoard(){
-
-        if(checkedId.length == 0){
-            alert('선택된 게시글이 없습니다.');
-            return;
-        }
+    async function deleteBoard(boardId){
 
         if(!confirm('삭제하시겠습니까?')){
             return;
         }
 
-        let boardIdArray = "";
-        for(let i=0; i<checkedId.length; i++ ){
-            if(boardIdArray === ""){
-                boardIdArray += checkedId[i];
-            }else{
-                boardIdArray += ("," + checkedId[i]);
-            }
-        }
-
-        const bodyParam = {boardIdArray : boardIdArray};        
+        const bodyParam = {boardIdArray : boardId};        
         const res = await fetch(backServer + "/board", {
             headers :{
                 accessToken: getCookie("accessToken")
@@ -80,7 +66,7 @@ const Index = ({data}) => {
         const data = await res.json();
         if(data.status == 200){
             alert('게시글이 삭제됐습니다.');
-            router.reload();
+            router.push("/board");
         }
         
     }    
@@ -199,7 +185,7 @@ const Index = ({data}) => {
                                 (id != "" && id == board.userDTO.userId) &&
                                 <>
                                     <Button variant="outline-success" onClick={()=> modify(board.boardId)}>수정</Button>
-                                    <Button variant="outline-danger" onClick={() => deleteBoard()}>삭제</Button>
+                                    <Button variant="outline-danger" onClick={() => deleteBoard(board.boardId)}>삭제</Button>
                                 </>
                             }
 
