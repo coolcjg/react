@@ -13,9 +13,6 @@ import Card from 'react-bootstrap/Card';
 
 const Index = ({data}) => {
 
-    console.log("data-----");
-    console.log(data);
-
     const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
 
     const router = useRouter();
@@ -40,11 +37,17 @@ const Index = ({data}) => {
         router.push("/board");
     }
 
-    async function modify(){
+    async function update(){
+
+        if(title.trim() === ''){
+            alert('제목을 입력하세요.');
+            return;
+        }
 
         setUploading(true);
 
         const formData = new FormData();
+        formData.append("boardId", boardId);
         formData.append("title", title);
         formData.append("region", region);
         formData.append("contents", contents);
@@ -53,13 +56,14 @@ const Index = ({data}) => {
             formData.append("files", files[i]);
         }
         
+        
         try{       
-            const res = await fetch(backServer + "/board", {
+            const res = await fetch(backServer + "/board/" + boardId, {
                 headers :{
                     accessToken: getCookie("accessToken")
                     ,refreshToken: getCookie("refreshToken")
                 }
-                , method:'PATCH'
+                , method:'PUT'
                 ,body : formData
             });
 
@@ -72,11 +76,14 @@ const Index = ({data}) => {
 
                 if(data.message === "ExpiredJwtException"){
                     console.log("ExpiredJwtException 체크");
+                    alert('로그인이 만료되었습니다. 새로운 accessToken을 가져옵니다.');
                     getAccessTokenByRefreshToken();
+                    update();
                 }else{
                     alert('게시글 수정이 실패했습니다.');
                     setUploading(false);   
                 }
+
             }
 
         }catch(error){
@@ -84,11 +91,14 @@ const Index = ({data}) => {
             alert('서버응답이 없습니다.');
             setUploading(false);
         }
+        
     }
 
     async function deleteMedia(mediaId){
-        console.log(mediaId);
-        console.log(board.mediaDTOList);
+
+        if(!confirm('미디어를 삭제하시겠습니까?')){
+            return;
+        }
         
         try{       
             const res = await fetch(backServer + "/media/" + mediaId, {
@@ -100,9 +110,6 @@ const Index = ({data}) => {
             });
 
             const data = await res.json();
-            console.log(res);
-            console.log("data----");
-            console.log(data);
 
             if(data.code === 200){
                 alert("미디어가 삭제되었습니다");
@@ -111,8 +118,8 @@ const Index = ({data}) => {
             }else{
                 if(data.message === "ExpiredJwtException"){
                     console.log("ExpiredJwtException 체크");
-                    alert('로그인이 만료되었습니다.');
-                    router.push('/login');
+                    alert('로그인이 만료되었습니다. 새로운 accessToken을 가져옵니다. 삭제버튼을 다시 눌러주세요');
+                    
                 }else{
                     alert('게시글 수정이 실패했습니다.');
                 }
@@ -220,7 +227,7 @@ const Index = ({data}) => {
                                     </div>
                                     <div className="card-body">
                                         <p className="card-title">{media.originalFileClientName}</p>
-                                        <a href="#" onClick={()=> deleteMedia(media.mediaId)} className="btn btn-primary btn-sm">삭제</a>
+                                        <button type="button" onClick={()=> deleteMedia(media.mediaId)} className="btn btn-primary btn-sm">삭제</button>
                                     </div>
                                 </div>
                             )
@@ -243,7 +250,7 @@ const Index = ({data}) => {
 
             <div className="gap-2 d-flex justify-content-end">
                 <Button onClick={()=> list()}>목록</Button>
-                <Button variant="outline-primary" disabled={uploading} onClick={()=> write()}>등록</Button>
+                <Button variant="outline-primary" disabled={uploading} onClick={()=> update()}>수정</Button>
             </div>
 
         </Container>

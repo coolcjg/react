@@ -132,45 +132,6 @@ const Index = ({data}) => {
         }
     }
 
-    async function deleteBoard(){
-
-        if(checkedId.length == 0){
-            alert('선택된 게시글이 없습니다.');
-            return;
-        }
-
-        if(!confirm('삭제하시겠습니까?')){
-            return;
-        }
-
-        let boardIdArray = "";
-        for(let i=0; i<checkedId.length; i++ ){
-            if(boardIdArray === ""){
-                boardIdArray += checkedId[i];
-            }else{
-                boardIdArray += ("," + checkedId[i]);
-            }
-        }
-
-        const bodyParam = {boardIdArray : boardIdArray};        
-        const res = await fetch(backServer + "/board", {
-            headers :{
-                accessToken: getCookie("accessToken")
-                ,refreshToken: getCookie("refreshToken")
-                ,'Content-Type':'application/json'
-            }
-            , method:'DELETE'
-            ,body : JSON.stringify(bodyParam)
-        });
-
-        const data = await res.json();
-        if(data.status == 200){
-            alert('게시글이 삭제됐습니다.');
-            router.reload();
-        }
-        
-    }
-
     if(data.code == 200){
 
         return (
@@ -286,7 +247,6 @@ const Index = ({data}) => {
                             </div>
 
                             <div className="gap-2 d-flex justify-content-end">
-                                <Button variant="outline-danger" onClick={() => deleteBoard()}>삭제</Button>
                                 <Button variant="outline-primary" onClick={()=> goWrite()}>글쓰기</Button>
                             </div>
 

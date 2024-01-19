@@ -30,20 +30,13 @@ const Index = ({data}) => {
             setName(name);
         }
 
-    }, []);        
-
-
-    console.log("프론트 data");
-    console.log(data);
+    }, []);
 
     const router = useRouter();
     const {boardId} = router.query;
 
     const [board, setBoard] = useState(data.board);
     const [mainMedia, setMainMedia] = useState(data.board.mediaDTOList[0]);
-    
-    console.log("board");
-    console.log(board);
 
     function list(){
         router.push("/board");
@@ -52,6 +45,45 @@ const Index = ({data}) => {
     function modify(boardId){
         router.push("/board/modify/" + boardId);
     }
+
+    async function deleteBoard(){
+
+        if(checkedId.length == 0){
+            alert('선택된 게시글이 없습니다.');
+            return;
+        }
+
+        if(!confirm('삭제하시겠습니까?')){
+            return;
+        }
+
+        let boardIdArray = "";
+        for(let i=0; i<checkedId.length; i++ ){
+            if(boardIdArray === ""){
+                boardIdArray += checkedId[i];
+            }else{
+                boardIdArray += ("," + checkedId[i]);
+            }
+        }
+
+        const bodyParam = {boardIdArray : boardIdArray};        
+        const res = await fetch(backServer + "/board", {
+            headers :{
+                accessToken: getCookie("accessToken")
+                ,refreshToken: getCookie("refreshToken")
+                ,'Content-Type':'application/json'
+            }
+            , method:'DELETE'
+            ,body : JSON.stringify(bodyParam)
+        });
+
+        const data = await res.json();
+        if(data.status == 200){
+            alert('게시글이 삭제됐습니다.');
+            router.reload();
+        }
+        
+    }    
 
     return (
         <>
@@ -142,7 +174,7 @@ const Index = ({data}) => {
                             <>
                             <h6 className="main-color">{board.region}</h6>
                             <div>
-                                <h1>{board.boardId}</h1>
+                                <h1>{board.title}</h1>
                             </div>
                             <div className="mb-4">
                                 {board.userDTO.name}[{board.userDTO.userId}] - {board.regDate}
@@ -165,8 +197,12 @@ const Index = ({data}) => {
                             <Button variant="outline-secondary" onClick={()=> list()}>목록</Button>
                             {
                                 (id != "" && id == board.userDTO.userId) &&
-                                <Button variant="outline-success" onClick={()=> modify(board.boardId)}>수정</Button>
+                                <>
+                                    <Button variant="outline-success" onClick={()=> modify(board.boardId)}>수정</Button>
+                                    <Button variant="outline-danger" onClick={() => deleteBoard()}>삭제</Button>
+                                </>
                             }
+
                         </div>                                        
                     </Col>
                 </Row>
