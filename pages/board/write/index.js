@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import {useRouter} from 'next/router'
+import { deleteUserCookie } from '@/pages/components/common';
 
 const Index = () => {
 
@@ -68,53 +69,22 @@ const Index = () => {
 
             const data = await res.json();
 
-            if(res.ok === true){
+            if(data.code === 201){
                 alert("게시물이 등록되었습니다");
                 router.push("/board");
+            }else if(data.code === 401){
+                alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+                deleteUserCookie();
+                router.push("/login");
             }else{
-
-                if(data.message === "ExpiredJwtException"){
-                    console.log("ExpiredJwtException");
-                    getAccessTokenByRefreshToken();
-                }else{
-                    alert('게시글 등록이 실패했습니다.');
-                    setUploading(false);   
-                }
+                alert('서버 에러가 발생하였습니다 : ' + data.message);
+                setUploading(false);
             }
 
         }catch(error){
             console.log(error);
             alert('서버응답이 없습니다.');
             setUploading(false);
-        }
-    }
-
-    async function getAccessTokenByRefreshToken(){
-
-        console.log("getAccessTokenByRefreshToken");
-
-        try{       
-            const res = await fetch(backServer + "/jwt/accessToken", {
-                headers :{
-                    refreshToken: getCookie("refreshToken")
-                }
-                , method:'GET'
-            });
-
-            const data = await res.json();
-
-            if(data.status == 200){
-                setCookie("accessToken", data.accessToken);
-                write();
-            }else{
-                alert('로그인이 만료됐습니다.');
-                router.push("/login");                
-            }
-
-        }catch(error){
-            if(data.status == 401){
-                alert('서버응답이 없습니다.');
-            }
         }
     }
 

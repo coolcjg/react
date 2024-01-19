@@ -6,11 +6,14 @@ import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import Button from 'react-bootstrap/Button'
 import Router, {useRouter} from 'next/router'
-import {getCookie, deleteCookie } from 'cookies-next'
 import {useEffect, useState, useLayoutEffect} from 'react';
+import {getCookie, setCookie, deleteCookie } from 'cookies-next'
 import '../../public/css/Style.css'
+import { deleteUserCookie } from '@/pages/components/common';
 
 const Header = () => {
+
+    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
 
     const [loaded, setLoaded] = useState(false);
 
@@ -26,18 +29,49 @@ const Header = () => {
 
         setId(id);
         setName(name);
+
+        if(id != undefined){
+            console.log("로그인");
+            getAccessTokenByRefreshToken();
+        }else{
+            console.log("비로그인");
+        }
+        
+
     }, []);
 
     function logout(){
-        deleteCookie("id");
-        deleteCookie("name");
-        deleteCookie("accessToken");
-        deleteCookie("refreshToken");
-
-        setId('');
-        setName('');
+        deleteUserCookie();
         router.push({pathname:"/"});
     }
+
+    async function getAccessTokenByRefreshToken(){
+
+        console.log("getAccessTokenByRefreshToken");
+
+        try{       
+            const res = await fetch(backServer + "/jwt/accessToken", {
+                headers :{
+                    refreshToken: getCookie("refreshToken")
+                }
+                , method:'GET'
+            });
+
+            const data = await res.json();
+
+            if(data.code == 200){
+                console.log("new Access Token : " + data.accessToken);
+                setCookie("accessToken", data.accessToken);
+            }else if(data.code == 401){
+                alert('로그인이 만료됐습니다.');
+                router.push("/login");
+            }
+
+        }catch(error){
+            console.error(error);
+            alert('서버 에러가 발생하였습니다.');
+        }
+    }      
 
     if(!loaded){
         return null;

@@ -8,6 +8,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import {useRouter} from 'next/router'
 import Card from 'react-bootstrap/Card';
+import { deleteUserCookie } from '@/pages/components/common';
 
 
 
@@ -56,7 +57,6 @@ const Index = ({data}) => {
             formData.append("files", files[i]);
         }
         
-        
         try{       
             const res = await fetch(backServer + "/board/" + boardId, {
                 headers :{
@@ -69,22 +69,18 @@ const Index = ({data}) => {
 
             const data = await res.json();
 
-            if(res.ok === true){
+            if(data.code === 200){
                 alert("게시물이 수정되었습니다");
                 router.push("/board/" + boardId);
+            }else if(data.code === 401){
+                console.log("ExpiredJwtException");
+                alert('로그인이 만료되었습니다.');
+                deleteUserCookie();
+                router.push("/login");                
             }else{
-
-                if(data.message === "ExpiredJwtException"){
-                    console.log("ExpiredJwtException 체크");
-                    alert('로그인이 만료되었습니다. 새로운 accessToken을 가져옵니다.');
-                    getAccessTokenByRefreshToken();
-                    update();
-                }else{
-                    alert('게시글 수정이 실패했습니다.');
-                    setUploading(false);   
-                }
-
-            }
+                alert('게시글 수정이 실패했습니다.');
+                setUploading(false);                   
+            };
 
         }catch(error){
             console.log(error);
@@ -129,35 +125,6 @@ const Index = ({data}) => {
             console.error(error);
             alert('오류가 발생하였습니다.');
         }    
-    }
-
-    async function getAccessTokenByRefreshToken(){
-
-        console.log("getAccessTokenByRefreshToken");
-
-        try{       
-            const res = await fetch(backServer + "/jwt/accessToken", {
-                headers :{
-                    refreshToken: getCookie("refreshToken")
-                }
-                , method:'GET'
-            });
-
-            const data = await res.json();
-
-            if(data.status == 200){
-                setCookie("accessToken", data.accessToken);
-                write();
-            }else{
-                alert('로그인이 만료됐습니다.');
-                router.push("/login");                
-            }
-
-        }catch(error){
-            if(data.status == 401){
-                alert('서버응답이 없습니다.');
-            }
-        }
     }
 
     return(

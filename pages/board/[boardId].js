@@ -8,11 +8,12 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import Pagination from 'react-bootstrap/Pagination'
 import {useRouter} from 'next/router'
-import {getCookie, deleteCookie } from 'cookies-next'
+import {getCookie, setCookie, deleteCookie } from 'cookies-next'
 import Link from 'next/link';
 import { ListGroup } from 'react-bootstrap';
 import Carousel from 'react-bootstrap/Carousel';
 import Spinner from 'react-bootstrap/Spinner';
+import { Elsie_Swash_Caps } from 'next/font/google';
 
 const Index = ({data}) => {
 
@@ -64,9 +65,15 @@ const Index = ({data}) => {
         });
 
         const data = await res.json();
-        if(data.status == 200){
+
+        if(data.code === 200){
             alert('게시글이 삭제됐습니다.');
             router.push("/board");
+        }else if(data.code == 401){
+            alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+            router.push('/login');
+        }else{
+            alert('서버 에러가 발생했습니다.');
         }
         
     }    
