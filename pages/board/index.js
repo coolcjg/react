@@ -70,6 +70,11 @@ const Index = ({data}) => {
     }
 
     async function search(){
+
+        if(searchParam.searchText.trim() === ""){
+            alert('검색어를 입력하세요.');
+            return;
+        }
         
         try{
             const param = 'searchType=' + searchParam.searchType + '&searchText=' + searchParam.searchText;
@@ -130,6 +135,13 @@ const Index = ({data}) => {
         if(searchParam.searchType === 'regDate'){
             setShowCalendar(true);
         }
+    }
+
+    const handleOnKeyPress = e => {
+        if(e.key=='Enter'){
+            search();
+        }
+
     }
 
     if(data.code == 200){
@@ -210,7 +222,11 @@ const Index = ({data}) => {
                                 
                                 <div className="">
                                     <Form.Group className="searchText">
-                                        <Form.Control type="text" placeholder="검색어" value={searchParam.searchText} onFocus={(e) => searchFocus()} onChange={(e) => setSearchParam({...searchParam, searchText:e.target.value})}/>
+                                        <Form.Control type="text" placeholder="검색어" value={searchParam.searchText} 
+                                                                    onFocus={(e) => searchFocus()} 
+                                                                    onChange={(e) => setSearchParam({...searchParam, searchText:e.target.value})}
+                                                                    onKeyUp={handleOnKeyPress}
+                                        />
                                     </Form.Group>                                
                                 </div>
 

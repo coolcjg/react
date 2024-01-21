@@ -36,8 +36,13 @@ const Index = ({data}) => {
     const router = useRouter();
     const {boardId} = router.query;
 
-    const [board, setBoard] = useState(data.board);
-    const [mainMedia, setMainMedia] = useState(data.board.mediaDTOList[0]);
+    const [board,setBoard] = useState(data.board);
+    console.log("data.board");
+    console.log(data.board);
+    const [mainMedia, setMainMedia] = useState(data.board != undefined ? data.board.mediaDTOList[0] : null);
+
+    console.log("board");
+    console.log(board);
 
     function list(){
         router.push("/board");
@@ -66,6 +71,8 @@ const Index = ({data}) => {
 
         const data = await res.json();
 
+        console.log(data);
+
         if(data.code === 200){
             alert('게시글이 삭제됐습니다.');
             router.push("/board");
@@ -83,7 +90,13 @@ const Index = ({data}) => {
             <Header></Header>
 
             <Container className="mt-4 mb-4">
-                {board.mediaDTOList.length > 0 &&                    
+                {
+                    board == undefined &&
+                    <div className="mb-5">
+                        게시글이 존재하지 않습니다.
+                    </div>
+                }
+                {board != undefined && board.mediaDTOList.length > 0 &&                    
                     <div className="mb-5">
                         <div className="mediaOut mb-4">
                             <div className="mediaIn">
@@ -189,7 +202,7 @@ const Index = ({data}) => {
                         <div className="gap-2 d-flex justify-content-end">
                             <Button variant="outline-secondary" onClick={()=> list()}>목록</Button>
                             {
-                                (id != "" && id == board.userDTO.userId) &&
+                                (id != "" && board != undefined && id == board.userDTO.userId) &&
                                 <>
                                     <Button variant="outline-success" onClick={()=> modify(board.boardId)}>수정</Button>
                                     <Button variant="outline-danger" onClick={() => deleteBoard(board.boardId)}>삭제</Button>
@@ -214,9 +227,6 @@ export async function getServerSideProps(context){
         const url = 'http://localhost:8080/board/'+boardId;
         const res = await fetch(url);
         const data = await res.json();
-
-        console.log("서버단");
-        console.log(data);
 
         return {props:{data}}
     }catch(error){
