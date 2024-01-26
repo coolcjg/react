@@ -84,6 +84,7 @@ const Header = () => {
                     <Navbar.Brand href="/">여행중</Navbar.Brand>
                     <Nav className="me-auto">
                         <Nav.Link onClick={()=> router.push({pathname:"/board"})}>게시판</Nav.Link>
+                        <Nav.Link onClick={()=> router.push({pathname:"/chat"})}>채팅방</Nav.Link>
                     </Nav>
 
                     {

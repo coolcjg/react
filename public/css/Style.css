@@ -160,3 +160,58 @@ th {
         max-width:1200px;
     }
 }
+
+
+/* 채팅 영역 */
+.chatDiv {
+    height:90vh;
+    margin-left:10%;
+    margin-right:10%;
+    border:1px solid black;
+
+}
+
+.chatTitle {
+    border:1px solid black;
+    height:3rem;
+}
+.chatTitle p {
+    font-size:1.5rem;
+    margin-bottom:0;
+}
+
+.chatTitle span {
+    font-size:1rem;
+    margin-left:0.4rem;
+    vertical-align: bottom;
+}
+
+.chatBody {
+    height:calc(100% - 8rem);
+    border:1px solid blue;
+
+}
+
+.chatInput {
+    width:100%;
+    height:5rem;
+}
+
+.chatInput > .messageDiv{
+    float:left;
+    border:1px solid gray;
+    width:calc(100% - 4rem);
+    height:5rem;
+}
+
+.chatInput > .sendDiv{
+    float:left;
+    border:1px solid gray;
+    width:4rem;
+    height:5rem;
+}
+
+.chatInput > .sendDiv button{
+    width:100%;
+    height:100%;
+}
