@@ -161,10 +161,9 @@ th {
     }
 }
 
-
 /* 채팅 영역 */
 .chatDiv {
-    height:90vh;
+    height:calc(100vh - 110px);
     margin-left:10%;
     margin-right:10%;
     border:1px solid black;
