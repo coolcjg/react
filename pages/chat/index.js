@@ -7,7 +7,8 @@ import { WebSocket } from "ws";
 
 const Index = ({}) => {
 
-    const [userId, setUserId] = useState('coolcjg');
+    const [roomId, setRoomId] = useState('traveling');
+    const [userId, setUserId] = useState('');
     const [chatList, setChatList] = useState([
         {type:'enter', userId:'coolcjg', message:'', time:'15:00'},
         {type:'enter', userId:'testUser', message:'', time:'15:01'},
@@ -19,17 +20,34 @@ const Index = ({}) => {
         {type:'quit', userId:'', message:'', time:'16:02'},
     ]);
 
-    const client = new Client({
-        brokerURL : 'ws://localhost:8080/ws',
-        onConnect: () => {
-            client.subscribe('/topic/test01', message =>
-                console.log(`Received : ${message.body}`)
-            );
-            client.publish({destination:'/topic/test01', body:'First Message'});
-        }
-    });
+    let client = null;
 
-    client.activate();
+    function initChat() {
+
+        if(userId === ''){
+            alert('이름을 입력하세요');
+            return;
+        }
+
+        client = new Client({
+            brokerURL : 'ws://localhost:8100/ws',
+            onConnect: () => {
+                
+                client.subscribe('/sub/chat/room/' + roomId, message =>
+                    showChat(message)
+                );
+                               
+                client.publish({destination:'/pub/chat/message', body:JSON.stringify({userId : userId, roomId:roomId, type:"enter", message:""})});
+            }
+        });
+    
+        client.activate();
+    }
+
+    function showChat(message){
+        console.log(message);
+        console.log(message.body);
+    }
 
     return (
         <>
@@ -38,6 +56,8 @@ const Index = ({}) => {
                 <div className="chatDiv">
                     <div className="chatTitle">
                         <p>방제목<span>90명</span></p>
+                        <input id="userId" type="text" onChange={(e) => setUserId(e.target.value)}/>
+                        <button type="button" onClick={()=>initChat()}>채팅방 입장</button>
                     </div>
 
                     <div className="chatBody">
