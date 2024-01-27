@@ -1,10 +1,13 @@
 import Header from "../components/header";
 import {useState} from 'react';
+import {Client} from '@stomp/stompjs'
+import { WebSocket } from "ws";
+
+
 
 const Index = ({}) => {
 
     const [userId, setUserId] = useState('coolcjg');
-    console.log("여기먼저? : " + userId);
     const [chatList, setChatList] = useState([
         {type:'enter', userId:'coolcjg', message:'', time:'15:00'},
         {type:'enter', userId:'testUser', message:'', time:'15:01'},
@@ -15,6 +18,18 @@ const Index = ({}) => {
         {type:'message', userId:'testUser', message:'아무말이나 하자33', time:'16:02'},
         {type:'quit', userId:'', message:'', time:'16:02'},
     ]);
+
+    const client = new Client({
+        brokerURL : 'ws://localhost:8080/ws',
+        onConnect: () => {
+            client.subscribe('/topic/test01', message =>
+                console.log(`Received : ${message.body}`)
+            );
+            client.publish({destination:'/topic/test01', body:'First Message'});
+        }
+    });
+
+    client.activate();
 
     return (
         <>
