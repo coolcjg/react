@@ -203,6 +203,12 @@ th {
     border:1px solid red;
 }
 
+.chat-notice span{
+    margin-left:0.5rem;
+    font-size : 0.7rem;
+    vertical-align: bottom;
+}
+
 .chat-me{
     max-width:70%;
     border:1px solid orange;

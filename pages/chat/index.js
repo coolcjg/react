@@ -1,9 +1,6 @@
 import Header from "../components/header";
 import {useState} from 'react';
 import {Client} from '@stomp/stompjs'
-import { WebSocket } from "ws";
-
-
 
 const Index = ({}) => {
 
@@ -19,35 +16,38 @@ const Index = ({}) => {
         {type:'message', userId:'testUser', message:'아무말이나 하자33', time:'16:02'},
         {type:'quit', userId:'', message:'', time:'16:02'},
     ]);
+    const [message, setMessage] = useState('');
 
-    let client = null;
+    let [client, setClient] = useState(null);
 
-    function initChat() {
+    function initChat(){
 
         if(userId === ''){
             alert('이름을 입력하세요');
             return;
         }
 
-        client = new Client({
+        const newClient = new Client({
             brokerURL : 'ws://localhost:8100/ws',
-            onConnect: () => {
-                
-                client.subscribe('/sub/chat/room/' + roomId, message =>
-                    showChat(message)
-                );
-                               
-                client.publish({destination:'/pub/chat/message', body:JSON.stringify({userId : userId, roomId:roomId, type:"enter", message:""})});
-            }
         });
+
+        newClient.onConnect = function(){
+            newClient.subscribe('/sub/chat/room/' + roomId, receiveMessage);
+            newClient.publish({destination:'/pub/chat/message', body:JSON.stringify({userId : userId, roomId:roomId, type:"enter", message:""})});
+        }        
     
-        client.activate();
+        newClient.activate();
+
+        setClient(newClient);
     }
 
-    function showChat(message){
-        console.log(message);
-        console.log(message.body);
-    }
+    function receiveMessage(message){
+        setChatList(chatList => [...chatList, JSON.parse(message.body)]);
+    };
+    
+    function sendMessage(){
+        client.publish({destination:'/pub/chat/message', body:JSON.stringify({userId : userId, roomId:roomId, type:"message", message:message})});
+    }      
 
     return (
         <>
@@ -70,16 +70,19 @@ const Index = ({}) => {
 
                         {
                             chatList.length > 0 && chatList.map((chat, index) =>{
+
                                 if(chat.type === 'enter'){
                                     return(
                                         <div className="chat-notice" key={index}>
                                             {chat.userId + "님이 접속하였습니다"}
+                                            <span>{chat.time}</span>
                                         </div>                                   
                                     )
                                 }else if(chat.type === 'exit'){
                                     return(
                                             <div className="chat-notice" key={index}>
                                                 {chat.userId + "님이 퇴장하였습니다."}
+                                                <span>{chat.time}</span>
                                             </div>                                   
                                         )
                                 }else if(chat.type === 'message' ){
@@ -119,9 +122,9 @@ const Index = ({}) => {
                     </div>
 
                     <div className="chatInput">
-                        <div className="messageDiv" contentEditable="true">
+                        <div className="messageDiv" contentEditable="true" value={message} onInput={(e) => setMessage(e.target.innerHTML)}>
                         </div>
-                        <div className="sendDiv">
+                        <div className="sendDiv" onClick={(e) => sendMessage()}>
                             <svg width="3.9rem" height="3.9rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_15_829)">
                             <rect width="24" height="24" fill="white"/>
