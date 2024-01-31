@@ -1,10 +1,10 @@
 import Header from "../components/header";
-import {useState} from 'react';
+import {useState, useRef } from 'react';
 import {Client} from '@stomp/stompjs'
 
 const Index = ({}) => {
 
-    const [roomId, setRoomId] = useState('traveling');
+    const [roomId, setRoomId] = useState('');
     const [userId, setUserId] = useState('');
     const [chatList, setChatList] = useState([
         {type:'enter', userId:'coolcjg', message:'', time:'15:00'},
@@ -29,6 +29,10 @@ const Index = ({}) => {
 
         const newClient = new Client({
             brokerURL : 'ws://localhost:8100/ws',
+            connectHeaders: {
+                userId: userId,
+                roomId : roomId,
+            },            
         });
 
         newClient.onConnect = function(){
@@ -42,13 +46,29 @@ const Index = ({}) => {
     }
 
     function receiveMessage(message){
+        console.log("message");
+        console.log(message);
         setChatList(chatList => [...chatList, JSON.parse(message.body)]);
     };
     
     function sendMessage(){
-        client.publish({destination:'/pub/chat/message', body:JSON.stringify({userId : userId, roomId:roomId, type:"message", message:message})});
-    }      
 
+        if(client == null){
+            alert('채팅방에 접속해주세요.');
+            return;
+        }
+
+        if(message === ''){
+            alert('메시지를 입력해주세요.');
+            return;
+        }
+
+        client.publish({destination:'/pub/chat/message', body:JSON.stringify({userId : userId, roomId:roomId, type:"message", message:message})});
+        setMessage('');
+    }
+
+    const messageDiv = useRef();
+    
     return (
         <>
             <Header></Header>
@@ -56,6 +76,7 @@ const Index = ({}) => {
                 <div className="chatDiv">
                     <div className="chatTitle">
                         <p>방제목<span>90명</span></p>
+                        <input id="roomId" type="text" onChange={(e) => setRoomId(e.target.value)}/>
                         <input id="userId" type="text" onChange={(e) => setUserId(e.target.value)}/>
                         <button type="button" onClick={()=>initChat()}>채팅방 입장</button>
                     </div>
@@ -122,8 +143,7 @@ const Index = ({}) => {
                     </div>
 
                     <div className="chatInput">
-                        <div className="messageDiv" contentEditable="true" value={message} onInput={(e) => setMessage(e.target.innerHTML)}>
-                        </div>
+                        <textarea className="messageDiv" ref={messageDiv} value={message} onInput={(e) => setMessage(e.target.value)}/>
                         <div className="sendDiv" onClick={(e) => sendMessage()}>
                             <svg width="3.9rem" height="3.9rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_15_829)">

@@ -241,6 +241,10 @@ th {
     height:4rem;
 }
 
+.chatInput textarea{
+    resize:none;
+}
+
 .chat-me .chat-message-user{
     text-align:right;
     border:1px solid black;
