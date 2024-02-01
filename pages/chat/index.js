@@ -20,12 +20,33 @@ const Index = ({}) => {
 
     let [client, setClient] = useState(null);
 
-    function initChat(){
+
+    async function initChat(){
+
+        if(roomId === ''){
+            alert('방 이름을 입력하세요');
+            return;
+        }
 
         if(userId === ''){
             alert('이름을 입력하세요');
             return;
         }
+        
+        try{   
+            const url = 'http://localhost:8100/isMember?roomId=' + roomId + "&userId=" + userId;
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if(data.code != 200){
+                alert('동일한 접속자가 있습니다.');
+                return;
+            }
+    
+        }catch(error){
+            alert('서버 오류가 발생하였습니다.');
+            return;
+        }   
 
         const newClient = new Client({
             brokerURL : 'ws://localhost:8100/ws',
