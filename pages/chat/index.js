@@ -7,6 +7,7 @@ const Index = ({}) => {
     const [roomId, setRoomId] = useState('');
     const [userId, setUserId] = useState('');
     const [chatList, setChatList] = useState([
+        /*
         {type:'enter', userId:'coolcjg', message:'', time:'15:00'},
         {type:'enter', userId:'testUser', message:'', time:'15:01'},
         {type:'enter', userId:'testUser2', message:'', time:'15:02'},
@@ -15,10 +16,15 @@ const Index = ({}) => {
         {type:'message', userId:'testUser', message:'아무말이나 하자22', time:'16:01'},
         {type:'message', userId:'testUser', message:'아무말이나 하자33', time:'16:02'},
         {type:'quit', userId:'', message:'', time:'16:02'},
+        */
     ]);
     const [message, setMessage] = useState('');
 
     let [client, setClient] = useState(null);
+
+    const [authCheck, setAuthCheck] = useState(false);
+
+    const [userCount, setUserCount] = useState(0);
 
 
     async function initChat(){
@@ -69,7 +75,13 @@ const Index = ({}) => {
     function receiveMessage(message){
         console.log("message");
         console.log(message);
-        setChatList(chatList => [...chatList, JSON.parse(message.body)]);
+
+        const messageBody = JSON.parse(message.body);
+        setChatList(chatList => [...chatList, messageBody]);
+
+        if(messageBody.type === 'enter' || messageBody.type ==='exit'){
+            setUserCount(messageBody.userCount);
+        }
     };
     
     function sendMessage(){
@@ -88,6 +100,10 @@ const Index = ({}) => {
         setMessage('');
     }
 
+    function toggleDeleteDiv(){
+        console.log("aaa");
+    }
+
     const messageDiv = useRef();
     
     return (
@@ -96,9 +112,10 @@ const Index = ({}) => {
 
                 <div className="chatDiv">
                     <div className="chatTitle">
-                        <p>방제목<span>90명</span></p>
+                        <p>채팅방<span>{userCount}명</span></p>
                         <input id="roomId" type="text" onChange={(e) => setRoomId(e.target.value)}/>
                         <input id="userId" type="text" onChange={(e) => setUserId(e.target.value)}/>
+                        관리자모드<input type="checkbox" checked={authCheck} onChange={(e) => setAuthCheck(e.target.checked)}/>
                         <button type="button" onClick={()=>initChat()}>채팅방 입장</button>
                     </div>
 
@@ -130,7 +147,7 @@ const Index = ({}) => {
                                 }else if(chat.type === 'message' ){
                                     if(chat.userId === userId){
                                         return(
-                                            <div className="chat-me" key={index}>
+                                            <div className="chatMessage chat-me" key={index} onClick={e => toggleDeleteDiv(e)}>
                                                 <div className="chat-message-user"><span>{chat.time}</span>{chat.userId}</div>
                                                 <div>
                                                 {chat.message}
@@ -139,7 +156,7 @@ const Index = ({}) => {
                                         )
                                     }else{
                                         return(
-                                            <div className="chat-other" key={index}>
+                                            <div className="chatMessage chat-other" key={index} onClick={e => toggleDeleteDiv(e)}>
                                                 <div className="chat-message-user">{chat.userId}<span>{chat.time}</span></div>
                                                 <div>
                                                 {chat.message}

@@ -209,6 +209,10 @@ th {
     vertical-align: bottom;
 }
 
+.chatMessage{
+    cursor : pointer;
+}
+
 .chat-me{
     max-width:70%;
     border:1px solid orange;
