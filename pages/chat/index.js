@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import Header from "../components/header";
-import {useState, useRef } from 'react';
+import {useState, useRef, useEffect} from 'react';
 import {Client} from '@stomp/stompjs'
 
 const Index = ({}) => {
@@ -11,7 +11,7 @@ const Index = ({}) => {
     const [userId, setUserId] = useState('');
     const [chatList, setChatList] = useState([
         /*
-        {type:'enter', userId:'coolcjg', message:'', time:'15:00', message-id:'111-111-111'},
+        {type:'enter', userId:'coolcjg', message:'', time:'15:00', messageId:'111-111-111'},
         {type:'enter', userId:'testUser', message:'', time:'15:01', message-id:'111-111-111'},
         {type:'enter', userId:'testUser2', message:'', time:'15:02', message-id:'111-111-111'},
         {type:'exit', userId:'testUser2', message:'', time:'15:03', message-id:'111-111-111'},
@@ -28,6 +28,8 @@ const Index = ({}) => {
     const [authCheck, setAuthCheck] = useState(false);
 
     const [userCount, setUserCount] = useState(0);
+    
+    const [deleteMessageId, setDeleteMessageId] = useState('');
 
 
     async function initChat(){
@@ -76,16 +78,21 @@ const Index = ({}) => {
     }
 
     function receiveMessage(message){
-        const messageBody = JSON.parse(message.body);
-        messageBody["message-id"] = message.headers["message-id"];
 
-        console.log("messageBody");
-        console.log(messageBody);
-        setChatList(chatList => [...chatList, messageBody]);
+        const messageBody = JSON.parse(message.body);
+
+        if(messageBody.type === 'enter' || messageBody.type ==='exit' || messageBody.type ==='message'){
+            setChatList(chatList => [...chatList, messageBody]);
+        }
 
         if(messageBody.type === 'enter' || messageBody.type ==='exit'){
-            setUserCount(messageBody.userCount);
+            setUserCount(messageBody.userCount);   
         }
+
+        if(messageBody.type =="delete"){
+            setDeleteMessageId(messageBody.message);
+        }
+        
     };
     
     function sendMessage(){
@@ -105,6 +112,10 @@ const Index = ({}) => {
     }
 
     function toggleDeleteDiv(e){
+
+        if(authCheck == false){
+            return;
+        }
 
         // 상위요소 클릭 이벤트 전파 금지
         e.stopPropagation();
@@ -143,14 +154,26 @@ const Index = ({}) => {
         }
     };
 
-    function deleteMessage(e, id){
+    function deleteMessagePub(e, id){
         e.stopPropagation();
         initDeleteDiv();
-        alert("삭제 클릭 : " + id);
-    }    
+        client.publish({destination:'/pub/chat/message', body:JSON.stringify({roomId:roomId, type:"delete", message:id})});
+    }
 
     const messageDiv = useRef();
     const chatDiv = useRef();
+
+    useEffect(()=>{
+        const copyChatList = chatList.map(function(element){
+            if(element.messageId == deleteMessageId){
+                element.message = '삭제된 메시지입니다.';   
+            }
+            return element;
+        })
+
+        setChatList(copyChatList);
+
+    }, [deleteMessageId])
     
     return (
         <>
@@ -202,22 +225,22 @@ const Index = ({}) => {
                                 }else if(chat.type === 'message' ){
                                     if(chat.userId === userId){
                                         return(
-                                            <div className="chatMessage chat-me" data-id={chat["message-id"]} key={index} onClick={e => toggleDeleteDiv(e)}>
+                                            <div className="chatMessage chat-me" key={index} onClick={e => toggleDeleteDiv(e)}>
                                                 <div className="chat-message-user"><span>{chat.time}</span>{chat.userId}</div>
                                                 <div>
                                                 {chat.message}
                                                 </div>
-                                                <div className="delete d-none" onClick={e=>{deleteMessage(e, chat["message-id"])}}>삭제</div>
+                                                <div className="delete d-none" onClick={e=>{deleteMessagePub(e, chat["messageId"])}}>삭제</div>
                                             </div>
                                         )
                                     }else{
                                         return(
-                                            <div className="chatMessage chat-other" data-id={chat["message-id"]} key={index} onClick={e => toggleDeleteDiv(e)}>
+                                            <div className="chatMessage chat-other" key={index} onClick={e => toggleDeleteDiv(e)}>
                                                 <div className="chat-message-user">{chat.userId}<span>{chat.time}</span></div>
                                                 <div>
                                                 {chat.message}
                                                 </div>
-                                                <div className="delete d-none" onClick={e=>{deleteMessage(e, chat["message-id"])}}>삭제</div>
+                                                <div className="delete d-none" onClick={e=>{deleteMessagePub(e, chat["messageId"])}}>삭제</div>
                                             </div>                                            
                                         )
 
