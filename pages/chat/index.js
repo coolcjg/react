@@ -1,3 +1,5 @@
+import React from 'react'
+import { createRoot } from 'react-dom/client';
 import Header from "../components/header";
 import {useState, useRef } from 'react';
 import {Client} from '@stomp/stompjs'
@@ -100,22 +102,62 @@ const Index = ({}) => {
         setMessage('');
     }
 
-    function toggleDeleteDiv(){
-        console.log("aaa");
+    function toggleDeleteDiv(e){
+
+        initDeleteDiv();
+        
+        //현재 클릭된 채팅 DIV
+        const closestDiv = e.target.closest(".chatMessage");
+
+        //전체 채팅 DIV
+        const chatRightMargin = chatDiv.current.getBoundingClientRect().right - e.clientX;
+
+        let leftMargin = e.clientX - closestDiv.getBoundingClientRect().left;
+        const topMargin = e.clientY - closestDiv.getBoundingClientRect().top;
+
+        if(chatRightMargin < 40){
+            leftMargin = leftMargin-40;
+        }
+
+        const deleteDiv = document.createElement("div");
+        deleteDiv.className="delete"
+        deleteDiv.style.left=(leftMargin + "px");
+        deleteDiv.style.top=(topMargin + "px");
+        deleteDiv.innerHTML = '삭제';
+       
+        closestDiv.appendChild(deleteDiv);        
     }
 
+    // 삭제DIV 영역 제거
+    function initDeleteDiv(){
+        const deleteDivList = document.getElementsByClassName("delete");
+        for(let i=0; i<deleteDivList.length; i++){
+            deleteDivList[i].remove();
+        }
+    };
+
     const messageDiv = useRef();
+    const chatDiv = useRef();
     
     return (
         <>
             <Header></Header>
 
-                <div className="chatDiv">
+                <div id="chatDiv" className="chatDiv" ref={chatDiv}>
+
                     <div className="chatTitle">
                         <p>채팅방<span>{userCount}명</span></p>
-                        <input id="roomId" type="text" onChange={(e) => setRoomId(e.target.value)}/>
-                        <input id="userId" type="text" onChange={(e) => setUserId(e.target.value)}/>
+
+                    </div>
+
+                    <div className="chatInfo">
+                        <label
+                         htmlFor="roomId">채팅방</label><input id="roomId" type="text" onChange={(e) => setRoomId(e.target.value)}/>
+                         <br></br>
+                        <label htmlFor="userId">이름</label><input id="userId" type="text" onChange={(e) => setUserId(e.target.value)}/>
+                        <br></br>
                         관리자모드<input type="checkbox" checked={authCheck} onChange={(e) => setAuthCheck(e.target.checked)}/>
+                        <br></br>
                         <button type="button" onClick={()=>initChat()}>채팅방 입장</button>
                     </div>
 
@@ -175,9 +217,6 @@ const Index = ({}) => {
 
                             })
                         }
-
-                      
-                        
                     </div>
 
                     <div className="chatInput">
@@ -196,8 +235,6 @@ const Index = ({}) => {
                             </svg>                        
                         </div>
                     </div>
-
-
 
                 </div>
 

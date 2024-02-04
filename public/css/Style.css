@@ -187,8 +187,13 @@ th {
     vertical-align: bottom;
 }
 
+.chatInfo{
+    border:1px solid black;
+    height:8rem;
+}
+
 .chatBody {
-    height:calc(100% - 7rem);
+    height:calc(100% - 15rem);
     border:1px solid blue;
 
     display: flex;
@@ -210,6 +215,7 @@ th {
 }
 
 .chatMessage{
+    position:relative;
     cursor : pointer;
 }
 
@@ -225,9 +231,16 @@ th {
     margin-right: auto;
 }
 
+.delete{
+    position:absolute;
+    border:1px solid black;
+    background-color:white;
+    width:40px;
+}
+
 .chatInput {
     width:100%;
-    height:5rem;
+    height:4rem;
 }
 
 .chatInput > .messageDiv{
