@@ -162,6 +162,8 @@ const Index = ({}) => {
 
     const messageDiv = useRef();
     const chatDiv = useRef();
+    const chatBodyDiv = useRef();
+    
 
     useEffect(()=>{
         const copyChatList = chatList.map(function(element){
@@ -174,6 +176,10 @@ const Index = ({}) => {
         setChatList(copyChatList);
 
     }, [deleteMessageId])
+
+    useEffect(()=>{
+        chatBodyDiv.current.scrollTop = chatBodyDiv.current.scrollHeight;
+    }, [chatList])
     
     return (
         <>
@@ -197,7 +203,7 @@ const Index = ({}) => {
                         <button type="button" onClick={()=>initChat()}>채팅방 입장</button>
                     </div>
 
-                    <div className="chatBody" onClick={e => initDeleteDiv()}>
+                    <div className="chatBody" ref={chatBodyDiv} onClick={e => initDeleteDiv()}>
                         {
                             chatList.length == 0 &&
                             <div className="chat-notice">
