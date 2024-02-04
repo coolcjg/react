@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import Header from "../components/header";
 import {useState, useRef } from 'react';
@@ -10,13 +11,13 @@ const Index = ({}) => {
     const [userId, setUserId] = useState('');
     const [chatList, setChatList] = useState([
         /*
-        {type:'enter', userId:'coolcjg', message:'', time:'15:00'},
-        {type:'enter', userId:'testUser', message:'', time:'15:01'},
-        {type:'enter', userId:'testUser2', message:'', time:'15:02'},
-        {type:'exit', userId:'testUser2', message:'', time:'15:03'},
-        {type:'message', userId:'coolcjg', message:'아무말이나 하자11', time:'16:00'},
-        {type:'message', userId:'testUser', message:'아무말이나 하자22', time:'16:01'},
-        {type:'message', userId:'testUser', message:'아무말이나 하자33', time:'16:02'},
+        {type:'enter', userId:'coolcjg', message:'', time:'15:00', message-id:'111-111-111'},
+        {type:'enter', userId:'testUser', message:'', time:'15:01', message-id:'111-111-111'},
+        {type:'enter', userId:'testUser2', message:'', time:'15:02', message-id:'111-111-111'},
+        {type:'exit', userId:'testUser2', message:'', time:'15:03', message-id:'111-111-111'},
+        {type:'message', userId:'coolcjg', message:'아무말이나 하자11', time:'16:00', message-id:'111-111-111'},
+        {type:'message', userId:'testUser', message:'아무말이나 하자22', time:'16:01', message-id:'111-111-111'},
+        {type:'message', userId:'testUser', message:'아무말이나 하자33', time:'16:02', message-id:'111-111-111'},
         {type:'quit', userId:'', message:'', time:'16:02'},
         */
     ]);
@@ -75,10 +76,11 @@ const Index = ({}) => {
     }
 
     function receiveMessage(message){
-        console.log("message");
-        console.log(message);
-
         const messageBody = JSON.parse(message.body);
+        messageBody["message-id"] = message.headers["message-id"];
+
+        console.log("messageBody");
+        console.log(messageBody);
         setChatList(chatList => [...chatList, messageBody]);
 
         if(messageBody.type === 'enter' || messageBody.type ==='exit'){
@@ -104,10 +106,17 @@ const Index = ({}) => {
 
     function toggleDeleteDiv(e){
 
+        // 상위요소 클릭 이벤트 전파 금지
+        e.stopPropagation();
+
         initDeleteDiv();
         
         //현재 클릭된 채팅 DIV
         const closestDiv = e.target.closest(".chatMessage");
+
+        if(closestDiv == null){
+            return;
+        }
 
         //전체 채팅 DIV
         const chatRightMargin = chatDiv.current.getBoundingClientRect().right - e.clientX;
@@ -117,24 +126,28 @@ const Index = ({}) => {
 
         if(chatRightMargin < 40){
             leftMargin = leftMargin-40;
-        }
+        }      
 
-        const deleteDiv = document.createElement("div");
-        deleteDiv.className="delete"
+        const deleteDiv = closestDiv.getElementsByClassName("delete")[0];
         deleteDiv.style.left=(leftMargin + "px");
-        deleteDiv.style.top=(topMargin + "px");
-        deleteDiv.innerHTML = '삭제';
-       
-        closestDiv.appendChild(deleteDiv);        
+        deleteDiv.style.top=(topMargin + "px");        
+        deleteDiv.style.top=(topMargin + "px");        
+        deleteDiv.classList.remove("d-none");
     }
 
     // 삭제DIV 영역 제거
     function initDeleteDiv(){
         const deleteDivList = document.getElementsByClassName("delete");
         for(let i=0; i<deleteDivList.length; i++){
-            deleteDivList[i].remove();
+            deleteDivList[i].classList.add("d-none");
         }
     };
+
+    function deleteMessage(e, id){
+        e.stopPropagation();
+        initDeleteDiv();
+        alert("삭제 클릭 : " + id);
+    }    
 
     const messageDiv = useRef();
     const chatDiv = useRef();
@@ -161,7 +174,7 @@ const Index = ({}) => {
                         <button type="button" onClick={()=>initChat()}>채팅방 입장</button>
                     </div>
 
-                    <div className="chatBody">
+                    <div className="chatBody" onClick={e => initDeleteDiv()}>
                         {
                             chatList.length == 0 &&
                             <div className="chat-notice">
@@ -189,20 +202,22 @@ const Index = ({}) => {
                                 }else if(chat.type === 'message' ){
                                     if(chat.userId === userId){
                                         return(
-                                            <div className="chatMessage chat-me" key={index} onClick={e => toggleDeleteDiv(e)}>
+                                            <div className="chatMessage chat-me" data-id={chat["message-id"]} key={index} onClick={e => toggleDeleteDiv(e)}>
                                                 <div className="chat-message-user"><span>{chat.time}</span>{chat.userId}</div>
                                                 <div>
                                                 {chat.message}
                                                 </div>
+                                                <div className="delete d-none" onClick={e=>{deleteMessage(e, chat["message-id"])}}>삭제</div>
                                             </div>
                                         )
                                     }else{
                                         return(
-                                            <div className="chatMessage chat-other" key={index} onClick={e => toggleDeleteDiv(e)}>
+                                            <div className="chatMessage chat-other" data-id={chat["message-id"]} key={index} onClick={e => toggleDeleteDiv(e)}>
                                                 <div className="chat-message-user">{chat.userId}<span>{chat.time}</span></div>
                                                 <div>
                                                 {chat.message}
                                                 </div>
+                                                <div className="delete d-none" onClick={e=>{deleteMessage(e, chat["message-id"])}}>삭제</div>
                                             </div>                                            
                                         )
 
