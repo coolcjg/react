@@ -32,7 +32,9 @@ const Index = ({}) => {
     const [deleteMessageId, setDeleteMessageId] = useState('');
 
     const [displayUserList, setDisplayUserList] = useState(false);
-    const [userList, setUserList] = useState([]);
+    const [userList, setUserList] = useState(['사용자1']);
+    const [deleteUserId, setDeleteUserId] = useState('');
+
 
 
     async function initChat(){
@@ -84,6 +86,9 @@ const Index = ({}) => {
 
         const messageBody = JSON.parse(message.body);
 
+        console.log("messageBody : ");
+        console.log(messageBody);
+
         if(messageBody.type === 'enter' || messageBody.type ==='exit' || messageBody.type ==='message'){
             setChatList(chatList => [...chatList, messageBody]);
         }
@@ -95,6 +100,11 @@ const Index = ({}) => {
 
         if(messageBody.type =="delete"){
             setDeleteMessageId(messageBody.message);
+        }
+
+        if(messageBody.type =="ban" && messageBody.message == userId){
+            setClient(null);
+            alert('강제퇴장 당하셨습니다.');
         }
         
     };
@@ -146,9 +156,42 @@ const Index = ({}) => {
         const deleteDiv = closestDiv.getElementsByClassName("delete")[0];
         deleteDiv.style.left=(leftMargin + "px");
         deleteDiv.style.top=(topMargin + "px");        
-        deleteDiv.style.top=(topMargin + "px");        
         deleteDiv.classList.remove("d-none");
     }
+
+    function toggleDeleteUser(e){
+
+        if(authCheck == false || e.target.innerHTML == userId){
+            return;
+        }
+
+        // 상위요소 클릭 이벤트 전파 금지
+        e.stopPropagation();
+
+        initDeleteDiv();
+        
+        //현재 클릭된 채팅 DIV
+        const closestDiv = e.target.closest(".userDiv");
+
+        if(closestDiv == null){
+            return;
+        }
+
+        //전체 채팅 DIV
+        const chatRightMargin = userListDiv.current.getBoundingClientRect().right - e.clientX;
+
+        let leftMargin = e.clientX - closestDiv.getBoundingClientRect().left;
+        const topMargin = e.clientY - closestDiv.getBoundingClientRect().top;
+
+        if(chatRightMargin < 40){
+            leftMargin = leftMargin-40;
+        }      
+
+        const deleteDiv = closestDiv.getElementsByClassName("delete")[0];
+        deleteDiv.style.left=(leftMargin + "px");
+        deleteDiv.style.top=(topMargin + "px");
+        deleteDiv.classList.remove("d-none");
+    }    
 
     // 삭제DIV 영역 제거
     function initDeleteDiv(){
@@ -164,10 +207,22 @@ const Index = ({}) => {
         client.publish({destination:'/pub/chat/message', body:JSON.stringify({roomId:roomId, type:"delete", message:id})});
     }
 
+    //유저 강제 퇴장
+    function banUserPub(e, userId){
+
+        if(!confirm('퇴장시키겠습니까?')){
+            return;
+        }
+                
+        e.stopPropagation();
+        initDeleteDiv();
+        client.publish({destination:'/pub/chat/message', body:JSON.stringify({roomId:roomId, type:"ban", message:userId})});        
+    }
+
     const messageDiv = useRef();
     const chatDiv = useRef();
     const chatBodyDiv = useRef();
-    
+    const userListDiv = useRef();
 
     useEffect(()=>{
         const copyChatList = chatList.map(function(element){
@@ -189,7 +244,7 @@ const Index = ({}) => {
         <>
             <Header></Header>
 
-                <div id="chatDiv" className="chatDiv" ref={chatDiv}>
+                <div id="chatDiv" className="chatDiv" ref={chatDiv} onClick={e => initDeleteDiv()}>
 
                     <div className="chatTitle">
                         <div>
@@ -212,7 +267,7 @@ const Index = ({}) => {
                         <br></br>
                         <button type="button" onClick={()=>initChat()}>채팅방 입장</button>
 
-                        <div className={"userListDiv " + (displayUserList == false ? 'd-none':'')}>
+                        <div ref={userListDiv} className={"userListDiv " + (displayUserList == false ? 'd-none':'')}>
                             <div className="title">접속자 리스트</div>
                             <div>
                                 {
@@ -221,7 +276,12 @@ const Index = ({}) => {
                                 }                                
                                 {
                                     userList.length > 0 && userList.map((user, index) =>{
-                                        return <p key={user}>{user}</p>
+                                        return (                                        
+                                            <div className="userDiv" key={user}>
+                                                <p onClick={e => toggleDeleteUser(e)}>{user}</p>
+                                                <div className="delete d-none" onClick={e=>{banUserPub(e, user)}}>퇴장</div>
+                                            </div>
+                                        )
                                     })
                                 }
                                 
@@ -230,7 +290,7 @@ const Index = ({}) => {
                         </div>
                     </div>
 
-                    <div className="chatBody" ref={chatBodyDiv} onClick={e => initDeleteDiv()}>
+                    <div className="chatBody" ref={chatBodyDiv}>
                         {
                             chatList.length == 0 &&
                             <div className="chat-notice">

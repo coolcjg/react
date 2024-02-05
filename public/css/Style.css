@@ -207,12 +207,28 @@ th {
 }
 
 .chatInfo .userListDiv .title{
-    margin-bottom:0.3rem;
+    border:1px solid black;
 }
 
 .chatInfo .userListDiv p{
     margin-bottom:0.1rem;
 }
+
+.chatInfo .userListDiv .userDiv{
+    position:relative;
+    cursor : pointer;
+    border:1px solid black;
+}
+
+.chatInfo .userListDiv .userDiv .ban{
+    position:absolute;
+    left:0;
+    top:0;
+    border:1px solid black;
+    background-color: white;
+}
+
+
 
 .chatBody {
     height:calc(100% - 15rem);
