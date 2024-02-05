@@ -31,6 +31,9 @@ const Index = ({}) => {
     
     const [deleteMessageId, setDeleteMessageId] = useState('');
 
+    const [displayUserList, setDisplayUserList] = useState(false);
+    const [userList, setUserList] = useState([]);
+
 
     async function initChat(){
 
@@ -86,7 +89,8 @@ const Index = ({}) => {
         }
 
         if(messageBody.type === 'enter' || messageBody.type ==='exit'){
-            setUserCount(messageBody.userCount);   
+            setUserCount(messageBody.userCount);
+            setUserList(messageBody.userList);
         }
 
         if(messageBody.type =="delete"){
@@ -179,7 +183,7 @@ const Index = ({}) => {
 
     useEffect(()=>{
         chatBodyDiv.current.scrollTop = chatBodyDiv.current.scrollHeight;
-    }, [chatList])
+    }, [chatList])  
     
     return (
         <>
@@ -188,7 +192,13 @@ const Index = ({}) => {
                 <div id="chatDiv" className="chatDiv" ref={chatDiv}>
 
                     <div className="chatTitle">
+                        <div>
                         <p>채팅방<span>{userCount}명</span></p>
+                        </div>
+
+                        <div className="userButtonDiv">
+                            <button type="button" className="btn btn-outline-secondary" onClick={e => setDisplayUserList(!displayUserList)}>접속자 리스트</button>
+                        </div>                        
 
                     </div>
 
@@ -201,6 +211,23 @@ const Index = ({}) => {
                         관리자모드<input type="checkbox" checked={authCheck} onChange={(e) => setAuthCheck(e.target.checked)}/>
                         <br></br>
                         <button type="button" onClick={()=>initChat()}>채팅방 입장</button>
+
+                        <div className={"userListDiv " + (displayUserList == false ? 'd-none':'')}>
+                            <div className="title">접속자 리스트</div>
+                            <div>
+                                {
+                                    userList.length == 0 && 
+                                        <p>사용자가 없습니다.</p>
+                                }                                
+                                {
+                                    userList.length > 0 && userList.map((user, index) =>{
+                                        return <p key={user}>{user}</p>
+                                    })
+                                }
+                                
+                            </div>
+
+                        </div>
                     </div>
 
                     <div className="chatBody" ref={chatBodyDiv} onClick={e => initDeleteDiv()}>

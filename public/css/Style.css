@@ -173,6 +173,7 @@ th {
 
 .chatTitle {
     display:flex;
+    justify-content:space-between;
     border:1px solid black;
     height:3rem;
 }
@@ -187,9 +188,30 @@ th {
     vertical-align: bottom;
 }
 
+.userButtonDiv{
+    display: flex;
+    align-items: center;
+}
+
 .chatInfo{
+    position:relative;
     border:1px solid black;
     height:8rem;
+}
+
+.chatInfo .userListDiv{
+    position:absolute;
+    top:0;
+    right:0;
+    border:1px solid black;
+}
+
+.chatInfo .userListDiv .title{
+    margin-bottom:0.3rem;
+}
+
+.chatInfo .userListDiv p{
+    margin-bottom:0.1rem;
 }
 
 .chatBody {
