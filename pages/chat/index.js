@@ -26,9 +26,7 @@ const Index = ({}) => {
     let [client, setClient] = useState(null);
 
     const [authCheck, setAuthCheck] = useState(false);
-
-    const [userCount, setUserCount] = useState(0);
-    
+        
     const [deleteMessageId, setDeleteMessageId] = useState('');
 
     const [displayUserList, setDisplayUserList] = useState(false);
@@ -82,7 +80,6 @@ const Index = ({}) => {
                 }
         
                 if(messageBody.type === 'enter' || messageBody.type ==='exit'){
-                    setUserCount(messageBody.userCount);
                     setUserList(messageBody.userList);
                 }
         
@@ -95,7 +92,6 @@ const Index = ({}) => {
                         newClient.deactivate();
                         setClient(null);
                         setUserList([]);
-                        setUserCount(0);
                         setChatList([]);
                         alert('강제퇴장 당하셨습니다.');
                         return;
@@ -252,7 +248,7 @@ const Index = ({}) => {
 
                     <div className="chatTitle">
                         <div>
-                        <p>채팅방<span>{userCount}명</span></p>
+                        <p>채팅방<span>{userList.length}명</span></p>
                         </div>
 
                         <div className="userButtonDiv">
