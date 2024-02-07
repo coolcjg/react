@@ -32,10 +32,7 @@ const Index = ({}) => {
     const [deleteMessageId, setDeleteMessageId] = useState('');
 
     const [displayUserList, setDisplayUserList] = useState(false);
-    const [userList, setUserList] = useState(['사용자1']);
-    const [deleteUserId, setDeleteUserId] = useState('');
-
-
+    const [userList, setUserList] = useState([]);
 
     async function initChat(){
 
@@ -73,7 +70,39 @@ const Index = ({}) => {
         });
 
         newClient.onConnect = function(){
-            newClient.subscribe('/sub/chat/room/' + roomId, receiveMessage);
+            newClient.subscribe('/sub/chat/room/' + roomId, function(message){
+
+                const messageBody = JSON.parse(message.body);
+
+                console.log("messageBody");
+                console.log(messageBody);
+        
+                if(messageBody.type === 'enter' || messageBody.type ==='exit' || messageBody.type ==='message'){
+                    setChatList(chatList => [...chatList, messageBody]);
+                }
+        
+                if(messageBody.type === 'enter' || messageBody.type ==='exit'){
+                    setUserCount(messageBody.userCount);
+                    setUserList(messageBody.userList);
+                }
+        
+                if(messageBody.type =="delete"){
+                    setDeleteMessageId(messageBody.message);
+                }
+        
+                if(messageBody.type =="ban"){
+                    if(messageBody.message == userId){
+                        newClient.deactivate();
+                        setClient(null);
+                        setUserList([]);
+                        setUserCount(0);
+                        setChatList([]);
+                        alert('강제퇴장 당하셨습니다.');
+                        return;
+                    }
+                }                
+
+            });
             newClient.publish({destination:'/pub/chat/message', body:JSON.stringify({userId : userId, roomId:roomId, type:"enter", message:""})});
         }        
     
@@ -81,35 +110,10 @@ const Index = ({}) => {
 
         setClient(newClient);
     }
-
-    function receiveMessage(message){
-
-        const messageBody = JSON.parse(message.body);
-
-        console.log("messageBody : ");
-        console.log(messageBody);
-
-        if(messageBody.type === 'enter' || messageBody.type ==='exit' || messageBody.type ==='message'){
-            setChatList(chatList => [...chatList, messageBody]);
-        }
-
-        if(messageBody.type === 'enter' || messageBody.type ==='exit'){
-            setUserCount(messageBody.userCount);
-            setUserList(messageBody.userList);
-        }
-
-        if(messageBody.type =="delete"){
-            setDeleteMessageId(messageBody.message);
-        }
-
-        if(messageBody.type =="ban" && messageBody.message == userId){
-            setClient(null);
-            alert('강제퇴장 당하셨습니다.');
-        }
-        
-    };
     
     function sendMessage(){
+
+        console.log("sendMessage");
 
         if(client == null){
             alert('채팅방에 접속해주세요.');
@@ -238,7 +242,7 @@ const Index = ({}) => {
 
     useEffect(()=>{
         chatBodyDiv.current.scrollTop = chatBodyDiv.current.scrollHeight;
-    }, [chatList])  
+    }, [chatList])     
     
     return (
         <>
