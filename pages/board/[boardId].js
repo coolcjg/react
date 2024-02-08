@@ -21,7 +21,7 @@ const Index = ({data}) => {
     const [name, setName] = useState("");
     const [board,setBoard] = useState(data.board);
     const [mainMedia, setMainMedia] = useState(data.board != undefined ? data.board.mediaDTOList[0] : null);
-    const [like, setLike] = useState(""); // 기본 : "", 좋아요 : 'Y', 싫어요 : 'N'
+    const [opinion, setOpinion] = useState(""); // 기본 : "", 좋아요 : 'Y', 싫어요 : 'N'
 
     useEffect(()=>{
         const id = getCookie("id");
@@ -73,12 +73,34 @@ const Index = ({data}) => {
         
     }
 
-    function likeEvent(param){
-        if(like === param){
-            setLike('');
-        }else{
-            setLike(param);
+    async function opinionEvent(param){
+
+        if(opinion === param){
+            param = ''
         }
+
+        const bodyParam = {userId : id, opinion:param};        
+        const res = await fetch(backServer + "/board/like", {
+            headers :{
+                accessToken: getCookie("accessToken")
+                ,refreshToken: getCookie("refreshToken")
+                ,'Content-Type':'application/json'
+            }
+            , method:'POST'
+            ,body : JSON.stringify(bodyParam)
+        });
+
+        const data = await res.json();
+
+        if(data.code === 200){
+            setOpinion(param);
+        }else if(data.code == 401){
+            alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+            router.push('/login');
+        }else{
+            alert('서버 에러가 발생했습니다.');
+        }
+
     }
 
     return (
@@ -183,14 +205,14 @@ const Index = ({data}) => {
                                 {board.userDTO.name}[{board.userDTO.userId}] - {board.regDate}
                                 </div>
 
-                                <div className="like" onClick={e => likeEvent('Y')}>
-                                    <svg width="2.4rem" height="2.4rem" viewBox="0 0 24 24" fill={like === 'Y' ? "pink":"none"} xmlns="http://www.w3.org/2000/svg">
+                                <div className="like" onClick={e => opinionEvent('Y')}>
+                                    <svg width="2.4rem" height="2.4rem" viewBox="0 0 24 24" fill={opinion === 'Y' ? "pink":"none"} xmlns="http://www.w3.org/2000/svg">
                                         <path d="M8 10V20M8 10L4 9.99998V20L8 20M8 10L13.1956 3.93847C13.6886 3.3633 14.4642 3.11604 15.1992 3.29977L15.2467 3.31166C16.5885 3.64711 17.1929 5.21057 16.4258 6.36135L14 9.99998H18.5604C19.8225 9.99998 20.7691 11.1546 20.5216 12.3922L19.3216 18.3922C19.1346 19.3271 18.3138 20 17.3604 20L8 20" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                     </svg>
                                 </div>
 
-                                <div className="dislike" onClick={e => likeEvent('N')}>
-                                    <svg width="2.4rem" height="2.4rem" viewBox="0 0 24 24" fill={like === 'N' ? "pink":"none"} xmlns="http://www.w3.org/2000/svg">
+                                <div className="dislike" onClick={e => opinionEvent('N')}>
+                                    <svg width="2.4rem" height="2.4rem" viewBox="0 0 24 24" fill={opinion === 'N' ? "pink":"none"} xmlns="http://www.w3.org/2000/svg">
                                         <path d="M8 14V4M8 14L4 14V4.00002L8 4M8 14L13.1956 20.0615C13.6886 20.6367 14.4642 20.884 15.1992 20.7002L15.2467 20.6883C16.5885 20.3529 17.1929 18.7894 16.4258 17.6387L14 14H18.5604C19.8225 14 20.7691 12.8454 20.5216 11.6078L19.3216 5.60779C19.1346 4.67294 18.3138 4.00002 17.3604 4.00002L8 4" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                     </svg>
                                 </div>
