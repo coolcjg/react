@@ -154,6 +154,24 @@ th {
     object-fit:contain;
 }
 
+.userInfo{
+    font-size:1.3rem;
+    display:flex;
+    align-items: flex-end;
+}
+
+.userInfo > div{
+    margin-right:20px;
+}
+
+.userInfo .like{
+    cursor:pointer;
+}
+
+.userInfo .dislike{
+    cursor:pointer;
+}
+
 
 @media (min-width: 1400px){
     .container{

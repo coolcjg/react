@@ -3,24 +3,25 @@ import Header from "../components/header";
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import Table from 'react-bootstrap/Table';
-import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
-import Pagination from 'react-bootstrap/Pagination'
+
 import {useRouter} from 'next/router'
-import {getCookie, setCookie, deleteCookie } from 'cookies-next'
-import Link from 'next/link';
-import { ListGroup } from 'react-bootstrap';
-import Carousel from 'react-bootstrap/Carousel';
+import {getCookie} from 'cookies-next'
+
 import Spinner from 'react-bootstrap/Spinner';
-import { Elsie_Swash_Caps } from 'next/font/google';
 
 const Index = ({data}) => {
 
     const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
 
+    const router = useRouter();
+    const {boardId} = router.query;
+
     const [id, setId] = useState("");
     const [name, setName] = useState("");
+    const [board,setBoard] = useState(data.board);
+    const [mainMedia, setMainMedia] = useState(data.board != undefined ? data.board.mediaDTOList[0] : null);
+    const [like, setLike] = useState(""); // 기본 : "", 좋아요 : 'Y', 싫어요 : 'N'
 
     useEffect(()=>{
         const id = getCookie("id");
@@ -31,18 +32,7 @@ const Index = ({data}) => {
             setName(name);
         }
 
-    }, []);
-
-    const router = useRouter();
-    const {boardId} = router.query;
-
-    const [board,setBoard] = useState(data.board);
-    console.log("data.board");
-    console.log(data.board);
-    const [mainMedia, setMainMedia] = useState(data.board != undefined ? data.board.mediaDTOList[0] : null);
-
-    console.log("board");
-    console.log(board);
+    }, []);    
 
     function list(){
         router.push("/board");
@@ -71,8 +61,6 @@ const Index = ({data}) => {
 
         const data = await res.json();
 
-        console.log(data);
-
         if(data.code === 200){
             alert('게시글이 삭제됐습니다.');
             router.push("/board");
@@ -83,7 +71,15 @@ const Index = ({data}) => {
             alert('서버 에러가 발생했습니다.');
         }
         
-    }    
+    }
+
+    function likeEvent(param){
+        if(like === param){
+            setLike('');
+        }else{
+            setLike(param);
+        }
+    }
 
     return (
         <>
@@ -182,8 +178,23 @@ const Index = ({data}) => {
                             <div>
                                 <h1>{board.title}</h1>
                             </div>
-                            <div className="mb-4">
+                            <div className="mb-4 userInfo">
+                                <div>
                                 {board.userDTO.name}[{board.userDTO.userId}] - {board.regDate}
+                                </div>
+
+                                <div className="like" onClick={e => likeEvent('Y')}>
+                                    <svg width="2.4rem" height="2.4rem" viewBox="0 0 24 24" fill={like === 'Y' ? "pink":"none"} xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 10V20M8 10L4 9.99998V20L8 20M8 10L13.1956 3.93847C13.6886 3.3633 14.4642 3.11604 15.1992 3.29977L15.2467 3.31166C16.5885 3.64711 17.1929 5.21057 16.4258 6.36135L14 9.99998H18.5604C19.8225 9.99998 20.7691 11.1546 20.5216 12.3922L19.3216 18.3922C19.1346 19.3271 18.3138 20 17.3604 20L8 20" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+
+                                <div className="dislike" onClick={e => likeEvent('N')}>
+                                    <svg width="2.4rem" height="2.4rem" viewBox="0 0 24 24" fill={like === 'N' ? "pink":"none"} xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 14V4M8 14L4 14V4.00002L8 4M8 14L13.1956 20.0615C13.6886 20.6367 14.4642 20.884 15.1992 20.7002L15.2467 20.6883C16.5885 20.3529 17.1929 18.7894 16.4258 17.6387L14 14H18.5604C19.8225 14 20.7691 12.8454 20.5216 11.6078L19.3216 5.60779C19.1346 4.67294 18.3138 4.00002 17.3604 4.00002L8 4" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+
                             </div>
                             <div>
                                 <p className="contents">
