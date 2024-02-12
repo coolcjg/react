@@ -30,6 +30,7 @@ const Index = ({data}) => {
         if(id != undefined){
             setId(id);
             setName(name);
+            getUserOpinion(id);
         }
 
     }, []);    
@@ -75,18 +76,27 @@ const Index = ({data}) => {
 
     async function opinionEvent(param){
 
-        if(opinion === param){
-            param = ''
+        if(id === ""){
+            alert('로그인이 필요합니다.');
+            return;
         }
 
-        const bodyParam = {userId : id, opinion:param};        
-        const res = await fetch(backServer + "/board/like", {
+        let method;
+        if(opinion === param){
+            param = ''
+            method = 'DELETE'
+        }else{
+            method = 'POST'
+        }
+
+        const bodyParam = {boardId: boardId, userId : id, opinion:param};        
+        const res = await fetch(backServer + "/board/opinion", {
             headers :{
                 accessToken: getCookie("accessToken")
                 ,refreshToken: getCookie("refreshToken")
                 ,'Content-Type':'application/json'
             }
-            , method:'POST'
+            , method:method
             ,body : JSON.stringify(bodyParam)
         });
 
@@ -102,6 +112,32 @@ const Index = ({data}) => {
         }
 
     }
+
+    async function getUserOpinion(userId){
+
+        const bodyParam = {boardId: boardId, userId : userId};
+        const res = await fetch(backServer + "/board/userOpinion", {
+            headers :{
+                accessToken: getCookie("accessToken")
+                ,refreshToken: getCookie("refreshToken")
+                ,'Content-Type':'application/json'
+            }
+            , method:'POST'
+            ,body : JSON.stringify(bodyParam)
+        });
+
+        const data = await res.json();
+
+        if(data.code === 200){
+            setOpinion(data.opinion.opinion);
+        }else if(data.code == 401){
+            alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+            router.push('/login');
+        }else{
+            alert('서버 에러가 발생했습니다.');
+        }
+
+    }    
 
     return (
         <>
