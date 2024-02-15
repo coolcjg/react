@@ -331,3 +331,34 @@ th {
 .chat-other span{
     margin-left:0.5rem;
 }
+
+
+/* 알람 메뉴 */
+.alarmFullDiv{
+    width:500px;
+    border:1px solid black;
+    margin:0 auto; 
+    padding:0.5rem 0.5rem;
+}
+
+.alarm{
+    border:1px solid black;
+    word-break:break-all;
+    padding:0.5rem 0.5rem;
+    margin-bottom:1rem; 
+}
+
+.alarm .title{
+    display:flex;
+    justify-content: space-between;
+}
+
+.alarm .title span{
+    font-size:1.3rem;
+}
+
+.alarm .title .date{
+    margin-left:1rem;
+    font-size: 1rem;
+}
+
