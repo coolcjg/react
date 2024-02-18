@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import Header from "../components/header";
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
@@ -35,6 +35,23 @@ const Index = ({data}) => {
         e.stopPropagation();
         console.log("delete ", opinionId);
     }
+
+    useEffect(() =>{
+        const id = 'coolcjg';
+        const name = '최종규';
+
+        const eventSource = new EventSource(backServer + "/sse?userId=" + id);
+        
+        eventSource.addEventListener("alarm", function(event){
+            let message = event.data;
+
+            console.log("sse revceived message : " + message);
+
+        });
+
+    }, [])
+
+
 
     return (
         <>
