@@ -348,6 +348,21 @@ th {
     margin-bottom:1rem; 
 }
 
+.alarmFullTitle{
+    display:flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.alarmFullTitle .green{
+    color:green;
+}
+
+.alarmFullTitle .red{
+    color:red;
+}
+
+
 .alarm .title{
     display:flex;
     justify-content: space-between;

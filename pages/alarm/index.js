@@ -24,13 +24,15 @@ const Index = ({data}) => {
     const router = useRouter(); 
 
     const [alarm, setAlarm] = useState(data);
+    const [newAlarm, setNewAlarm] = useState();
+
+    const [test, setTest] = useState([]);
 
     function movePage(link){
         console.log(link);
     }
 
     function deleteAlarm(e, opinionId){
-        
         //클릭 이벤트 전파 금지
         e.stopPropagation();
         console.log("delete ", opinionId);
@@ -42,16 +44,27 @@ const Index = ({data}) => {
 
         const eventSource = new EventSource(backServer + "/sse?userId=" + id);
         
-        eventSource.addEventListener("alarm", function(event){
-            let message = event.data;
+        eventSource.addEventListener("alarm", function(event){           
+            const message = JSON.parse(event.data);
 
-            console.log("sse revceived message : " + message);
+            if(message.type === '좋아요'){
+                console.log("sse revceived message");
+                console.log(message);
+    
+                setNewAlarm(message);
+            }
 
         });
 
     }, [])
 
-
+    useEffect(()=>{
+        if(newAlarm != undefined){
+            console.log("prev Test");
+            console.log(test);
+            setTest((test) => [...test, newAlarm]);
+        }
+    }, [newAlarm]);
 
     return (
         <>
@@ -110,10 +123,9 @@ export async function getServerSideProps(context){
 
         const data = {code:200, list:[{opinionId:1, date:'2월 12일', type:'opinion', message:'SS님이 좋아요를 눌렀습니다.', link:'http://aa.co.kr/board?aa'}, {opinionId:2, date:'2월 12일', type:'opinion', message:'AA님이 좋아요를 눌렀습니다.', link:'http://aa.co.kr/board?bb'}]}
 
-
         return {props:{data}}
     }catch(error){
-        return {props:{data:{code:500, message:'서버와 연결되지 않았습니다.'}}};
+        return {props:{data:{code:500, list:[]}}};
     }
 
     

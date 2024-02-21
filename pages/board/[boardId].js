@@ -89,7 +89,7 @@ const Index = ({data}) => {
             method = 'POST'
         }
 
-        const bodyParam = {boardId: boardId, userId : id, opinion:param};        
+        const bodyParam = {boardId: boardId, userId : id, value:param, type:"like"};        
         const res = await fetch(backServer + "/board/opinion", {
             headers :{
                 accessToken: getCookie("accessToken")
@@ -129,7 +129,7 @@ const Index = ({data}) => {
         const data = await res.json();
 
         if(data.code === 200){
-            setOpinion(data.opinion.opinion);
+            setOpinion(data.opinion.value);
         }else if(data.code == 401){
             alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
             router.push('/login');

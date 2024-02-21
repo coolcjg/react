@@ -9,8 +9,11 @@ import Button from 'react-bootstrap/Button';
 import crypto from "crypto"
 import Router, {useRouter} from 'next/router'
 import {setCookie} from 'cookies-next'
+import { deleteUserCookie } from '@/pages/components/common';
 
 const Index = () => { 
+
+    deleteUserCookie();
 
     const router = useRouter(); 
 
