@@ -25,16 +25,14 @@ const Header = () => {
         setLoaded(true);
 
         const id = getCookie("id");
-        const name = getCookie("name");        
+        const name = getCookie("name");
 
         setId(id);
-        setName(name);
+        setName(name);   
 
         if(id != undefined){
-            console.log("로그인");
             getAccessTokenByRefreshToken();
         }else{
-            console.log("비로그인");
         }
         
 

@@ -21,12 +21,15 @@ import 'react-date-range/dist/theme/default.css';
 const Index = ({data}) => {
 
     const backServer = process.env.NEXT_PUBLIC_ALARM_SERVER;
+    const travelingServer = process.env.NEXT_PUBLIC_BACK_SERVER;
     const router = useRouter(); 
 
-    const [alarm, setAlarm] = useState(data);
+    const [alarm, setAlarm] = useState([]);
     const [newAlarm, setNewAlarm] = useState();
 
     const [test, setTest] = useState([]);
+
+    const [id, setId] = useState(getCookie("id"));
 
     function movePage(link){
         console.log(link);
@@ -39,46 +42,84 @@ const Index = ({data}) => {
     }
 
     useEffect(() =>{
-        const id = 'coolcjg';
-        const name = '최종규';
 
-        const eventSource = new EventSource(backServer + "/sse?userId=" + id);
+        if(id != ''){
+
+            list(id);
+
+            const eventSource = new EventSource(backServer + "/sse?userId=" + id);
         
-        eventSource.addEventListener("alarm", function(event){           
-            const message = JSON.parse(event.data);
-
-            if(message.type === '좋아요'){
-                console.log("sse revceived message");
-                console.log(message);
+            eventSource.addEventListener("alarm", function(event){           
+                const message = JSON.parse(event.data);
     
-                setNewAlarm(message);
-            }
+                if(message.type === '좋아요'){       
+                    setNewAlarm(message);
+                }
+    
+            });            
+        }
 
-        });
-
-    }, [])
+    }, [id])
 
     useEffect(()=>{
         if(newAlarm != undefined){
-            console.log("prev Test");
-            console.log(test);
-            setTest((test) => [...test, newAlarm]);
+            newAlarm["message"] = getAlarmMessage(newAlarm);
+            setAlarm(alarm => [newAlarm, ...alarm]);
         }
     }, [newAlarm]);
+
+    async function list(userId){
+        try{       
+            const res = await fetch(travelingServer + "/alarm/list?userId=" + userId, {
+                headers :{
+                    accessToken: getCookie("accessToken")
+                    ,refreshToken: getCookie("refreshToken")
+                }
+                , method:'GET'
+            });
+
+            const data = await res.json();
+
+            data.list.map((temp, index) => {
+                temp["message"] = getAlarmMessage(temp);
+            });
+
+            setAlarm(data.list);
+
+        }catch(e){
+            console.log(e);
+        }        
+
+    }
+
+    function getAlarmMessage(alarm){
+        
+        let message;
+
+        if(alarm.type === '좋아요'){    
+            if(alarm.value === 'Y'){
+                message = alarm.alarmId + alarm.fromUserId + '님이 좋아요를 눌렀습니다.';
+            }else if(alarm.value ==='N'){
+                message = alarm.fromUserId + '님이 싫어요를 눌렀습니다.';
+            }
+        }
+        
+        return message;
+    }
 
     return (
         <>
             <Header></Header>
 
             <div className="alarmFullDiv">
-                <div className="alarmFullTitle"><h4>알람</h4></div>
+                <div className="alarmFullTitle"><h4>알람{alarm.length}</h4></div>
 
-                {alarm.code == 200 &&
-                    alarm.list.map((alarmOne, index) => (
-                        <div key={alarmOne.opinionId} className="alarm" onClick={e => movePage(alarmOne.link)}>
+                {alarm.length > 0 &&
+                    alarm.map((alarmOne, index) => (
+                        <div key={alarmOne.alarmId} className="alarm">
                             <div className="title">
                                 <div>
-                                    <span className="type">{alarmOne.type}</span><span className="date">{alarmOne.date}</span>
+                                    <span className="type">{alarmOne.type}</span><span className="date">{alarmOne.regDate}</span>
                                 </div>
                                 <div onClick={e => deleteAlarm(e, alarmOne.opinionId)}>
                                     <svg width="2.2rem" height="2.2rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,7 +132,7 @@ const Index = ({data}) => {
                     ))
                 }
 
-                {alarm.code == 500 &&
+                {alarm.length == 0 &&
                         <div className="alarm">
                         <div className="title">
                             <div>
@@ -107,29 +148,5 @@ const Index = ({data}) => {
 
 
 };
-
-export async function getServerSideProps(context){
-
-    try{
-       
-        let {pageNumber} = context.query;
-
-        if(pageNumber == null){
-            pageNumber = 1;
-        }
-
-        //const res = await fetch('http://localhost:8080/board/list?pageNumber='+pageNumber);
-        //const data = await res.json();
-
-        const data = {code:200, list:[{opinionId:1, date:'2월 12일', type:'opinion', message:'SS님이 좋아요를 눌렀습니다.', link:'http://aa.co.kr/board?aa'}, {opinionId:2, date:'2월 12일', type:'opinion', message:'AA님이 좋아요를 눌렀습니다.', link:'http://aa.co.kr/board?bb'}]}
-
-        return {props:{data}}
-    }catch(error){
-        return {props:{data:{code:500, list:[]}}};
-    }
-
-    
-}
-
 
 export default Index;

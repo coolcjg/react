@@ -43,8 +43,6 @@ const Index = () => {
         }
     }
 
-
-
     async function login(){
 
         if(id === ''){
