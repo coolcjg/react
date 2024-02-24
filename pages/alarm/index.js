@@ -1,24 +1,12 @@
 import {useState, useEffect} from 'react';
 import Header from "../components/header";
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
-import Table from 'react-bootstrap/Table';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button'
-import Pagination from 'react-bootstrap/Pagination'
 import {useRouter} from 'next/router'
-import {getCookie, deleteCookie } from 'cookies-next'
-import Link from 'next/link';
-import {Calendar} from 'react-date-range'
-import { DateRange  } from 'react-date-range';
-import { format } from "date-fns"
-import CloseButton from 'react-bootstrap/CloseButton';
+import {getCookie} from 'cookies-next'
 
 import 'react-date-range/dist/styles.css'; 
 import 'react-date-range/dist/theme/default.css'; 
 
-const Index = ({data}) => {
+const Index = () => {
 
     const backServer = process.env.NEXT_PUBLIC_ALARM_SERVER;
     const travelingServer = process.env.NEXT_PUBLIC_BACK_SERVER;
@@ -26,19 +14,77 @@ const Index = ({data}) => {
 
     const [alarm, setAlarm] = useState([]);
     const [newAlarm, setNewAlarm] = useState();
-
-    const [test, setTest] = useState([]);
-
     const [id, setId] = useState(getCookie("id"));
 
-    function movePage(link){
-        console.log(link);
+    async function checkAlarm(alarmParam){
+
+        try{
+            const res = await fetch(travelingServer + "/alarm/check/" + alarmParam.alarmId, {
+                headers :{
+                    accessToken: getCookie("accessToken")
+                    ,refreshToken: getCookie("refreshToken")
+                }
+                , method:'PUT'
+            });
+
+            const data = await res.json();
+
+            if(data.code == 200){
+
+                const newAlarm = alarm.map((e, index) =>{
+                    if(e.alarmId == alarmParam.alarmId){
+                        e.checked = "Y";
+                    }
+                    return e;
+                });
+                
+                setAlarm(newAlarm);
+
+                if(confirm('해당 페이지로 이동하시겠습니까?')){
+                    moveAlarmPage(alarmParam.boardId);
+                }
+            }else{
+                console.error('serverError :  code : ' +  data.code + ', message : ' + data.message);
+            }
+
+        }catch(e){
+            console.error(e);
+        }
     }
 
-    function deleteAlarm(e, opinionId){
+    function moveAlarmPage(boardId){
+        router.push('/board/' + boardId);
+    }
+
+    async function deleteAlarm(e, alarmId){
+
         //클릭 이벤트 전파 금지
         e.stopPropagation();
-        console.log("delete ", opinionId);
+
+        try{
+
+            const res = await fetch(travelingServer + "/alarm/" + alarmId, {
+                headers :{
+                    accessToken: getCookie("accessToken")
+                    ,refreshToken: getCookie("refreshToken")
+                }
+                , method:'DELETE'
+            });
+
+            if(res.ok === true){
+                const data = await res.json();
+            
+                if(data.code == 200){
+                    list(id);
+                }else{
+                    console.error('serverError :  code : ' +  data.code + ', message : ' + data.message);
+                }                
+            }
+
+        }catch(e){
+            console.error(e);
+        }         
+
     }
 
     useEffect(() =>{
@@ -64,12 +110,20 @@ const Index = ({data}) => {
     useEffect(()=>{
         if(newAlarm != undefined){
             newAlarm["message"] = getAlarmMessage(newAlarm);
-            setAlarm(alarm => [newAlarm, ...alarm]);
+            if(alarm.length >= 10){
+                let copiedAlarm = alarm;
+                copiedAlarm.pop();
+                copiedAlarm.splice(0,0,newAlarm);
+                setAlarm(copiedAlarm);
+            }else{
+                setAlarm(alarm => [newAlarm, ...alarm]);
+            }
         }
     }, [newAlarm]);
 
     async function list(userId){
-        try{       
+
+        try{
             const res = await fetch(travelingServer + "/alarm/list?userId=" + userId, {
                 headers :{
                     accessToken: getCookie("accessToken")
@@ -80,14 +134,18 @@ const Index = ({data}) => {
 
             const data = await res.json();
 
-            data.list.map((temp, index) => {
-                temp["message"] = getAlarmMessage(temp);
-            });
+            if(data.code == 200){
+                data.list.map((temp, index) => {
+                    temp["message"] = getAlarmMessage(temp);
+                });
 
-            setAlarm(data.list);
+                setAlarm(data.list);
+            }else{
+                console.error('serverError :  code : ' +  data.code + ', message : ' + data.message);
+            }
 
         }catch(e){
-            console.log(e);
+            console.error(e);
         }        
 
     }
@@ -116,12 +174,12 @@ const Index = ({data}) => {
 
                 {alarm.length > 0 &&
                     alarm.map((alarmOne, index) => (
-                        <div key={alarmOne.alarmId} className="alarm">
+                        <div key={alarmOne.alarmId} className={"alarm" + (alarmOne.checked != "Y" ? " notCheck" : "")} onClick={e => checkAlarm(alarmOne)}>
                             <div className="title">
                                 <div>
                                     <span className="type">{alarmOne.type}</span><span className="date">{alarmOne.regDate}</span>
                                 </div>
-                                <div onClick={e => deleteAlarm(e, alarmOne.opinionId)}>
+                                <div onClick={e => deleteAlarm(e, alarmOne.alarmId)}>
                                     <svg width="2.2rem" height="2.2rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path fillRule="evenodd" clipRule="evenodd" d="M9 4.5V6H6V7.5H18V6H15V4.5H9ZM6.75 8.25H8.25V17.6893L8.56066 18H15.4393L15.75 17.6893V8.25H17.25V18.3107L16.0607 19.5H7.93934L6.75 18.3107V8.25Z" fill="#080341"/>
                                     </svg>
@@ -143,10 +201,7 @@ const Index = ({data}) => {
                 }
             </div>
         </>
-    )        
-
-
-
+    )
 };
 
 export default Index;
