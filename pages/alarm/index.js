@@ -13,6 +13,7 @@ const Index = () => {
     const router = useRouter(); 
 
     const [alarm, setAlarm] = useState([]);
+    const [count, setCount] = useState(0);
     const [newAlarm, setNewAlarm] = useState();
     const [id, setId] = useState(getCookie("id"));
 
@@ -140,6 +141,7 @@ const Index = () => {
                 });
 
                 setAlarm(data.list);
+                setCount(data.count);
             }else{
                 console.error('serverError :  code : ' +  data.code + ', message : ' + data.message);
             }
@@ -170,7 +172,7 @@ const Index = () => {
             <Header></Header>
 
             <div className="alarmFullDiv">
-                <div className="alarmFullTitle"><h4>알람{alarm.length}</h4></div>
+                <div className="alarmFullTitle"><h4>알람{count}</h4></div>
 
                 {alarm.length > 0 &&
                     alarm.map((alarmOne, index) => (
