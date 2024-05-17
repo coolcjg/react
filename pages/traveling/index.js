@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import Header from "../components/header";
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
@@ -20,7 +20,7 @@ import 'react-date-range/dist/theme/default.css';
 
 const Index = ({data}) => {
 
-    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+    const backServer = process.env.NEXT_PUBLIC_TRAVELING_SERVER;
 
     const router = useRouter(); 
 
@@ -35,6 +35,22 @@ const Index = ({data}) => {
     const [searchParam, setSearchParam] = useState({searchType:"all", searchText:""});
     
     const [showCalendar, setShowCalendar] = useState(false);
+
+    useEffect(()=>{
+        const id = getCookie("id");
+        const name = getCookie("name");
+
+        if(id != undefined){
+            setId(id);
+            setName(name);
+            getUserOpinion(id);
+        }
+
+    }, []);
+
+
+
+
 
     function checkAll(e){
         if(e.target.checked){
@@ -287,7 +303,7 @@ const Index = ({data}) => {
 
 export async function getServerSideProps(context){
 
-    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+    const backServer = process.env.NEXT_PUBLIC_TRAVELING_SERVER;
 
     try{
        
@@ -297,11 +313,16 @@ export async function getServerSideProps(context){
             pageNumber = 1;
         }
 
-        const res = await fetch(backServer + '/board/list?pageNumber='+pageNumber);
+        console.log(backServer);
+
+        const res = await fetch(backServer + '/board/list');
         const data = await res.json();
+
+        console.log(data)
 
         return {props:{data}}
     }catch(error){
+        console.log(error);
         return {props:{data:{code:'F500', message:'서버와 연결되지 않았습니다.'}}};
     }
 
