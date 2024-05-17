@@ -93,7 +93,7 @@ const Index = ({data}) => {
 
 export async function getServerSideProps(context){
 
-    const galleryServerDomain = process.env.NEXT_PUBLIC_GALLERY_SERVER_DOMAIN;
+    const galleryServerDomain = process.env.NEXT_PUBLIC_GALLERY_SERVER_DOMAIN; 
 
     try{
        
