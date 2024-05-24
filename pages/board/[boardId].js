@@ -12,7 +12,7 @@ import Spinner from 'react-bootstrap/Spinner';
 
 const Index = ({data}) => {
 
-    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
 
     const router = useRouter();
     const {boardId} = router.query;
@@ -50,7 +50,7 @@ const Index = ({data}) => {
         }
 
         const bodyParam = {boardIdArray : boardId};        
-        const res = await fetch(backServer + "/board", {
+        const res = await fetch(boardServerDomain + "/board", {
             headers :{
                 accessToken: getCookie("accessToken")
                 ,refreshToken: getCookie("refreshToken")
@@ -90,7 +90,7 @@ const Index = ({data}) => {
         }
 
         const bodyParam = {boardId: boardId, userId : id, value:param, type:"like"};        
-        const res = await fetch(backServer + "/board/opinion", {
+        const res = await fetch(boardServerDomain + "/board/opinion", {
             headers :{
                 accessToken: getCookie("accessToken")
                 ,refreshToken: getCookie("refreshToken")
@@ -116,7 +116,7 @@ const Index = ({data}) => {
     async function getUserOpinion(userId){
 
         const bodyParam = {boardId: boardId, userId : userId};
-        const res = await fetch(backServer + "/board/userOpinion", {
+        const res = await fetch(boardServerDomain + "/board/userOpinion", {
             headers :{
                 accessToken: getCookie("accessToken")
                 ,refreshToken: getCookie("refreshToken")
@@ -290,10 +290,12 @@ const Index = ({data}) => {
 
 export async function getServerSideProps(context){
 
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
+
     try{
         let {boardId} = context.query;
 
-        const url = 'http://localhost:8080/board/'+boardId;
+        const url = boardServerDomain + '/board/'+boardId;
         const res = await fetch(url);
         const data = await res.json();
 

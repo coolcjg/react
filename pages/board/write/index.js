@@ -11,7 +11,7 @@ import { deleteUserCookie } from '@/pages/components/common';
 
 const Index = () => {
 
-    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
 
     const router = useRouter();
 
@@ -58,7 +58,7 @@ const Index = () => {
         }
         
         try{       
-            const res = await fetch(backServer + "/board", {
+            const res = await fetch(boardServerDomain + "/board", {
                 headers :{
                     accessToken: getCookie("accessToken")
                     ,refreshToken: getCookie("refreshToken")

@@ -20,7 +20,7 @@ import 'react-date-range/dist/theme/default.css';
 
 const Index = ({data}) => {
 
-    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
 
     const router = useRouter(); 
 
@@ -78,7 +78,7 @@ const Index = ({data}) => {
         
         try{
             const param = 'searchType=' + searchParam.searchType + '&searchText=' + searchParam.searchText;
-            const res = await fetch('http://localhost:8080/board/list?' + param);
+            const res = await fetch(boardServerDomain + '/board/list?' + param);
             const data = await res.json();
 
             setPageNumber(data.pageNumber);
@@ -97,7 +97,7 @@ const Index = ({data}) => {
 
         try{
             const param = 'pageNumber=' + pageNumber + '&searchType=' + searchParam.searchType + '&searchText=' + searchParam.searchText;
-            const res = await fetch('http://localhost:8080/board/list?' + param);
+            const res = await fetch(boardServerDomain + '/board/list?' + param);
             const data = await res.json();
 
             setPageNumber(data.pageNumber);
@@ -287,7 +287,7 @@ const Index = ({data}) => {
 
 export async function getServerSideProps(context){
 
-    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
 
     try{
        
@@ -297,7 +297,7 @@ export async function getServerSideProps(context){
             pageNumber = 1;
         }
 
-        const res = await fetch(backServer + '/board/list?pageNumber='+pageNumber);
+        const res = await fetch(boardServerDomain + '/board/list?pageNumber='+pageNumber);
         const data = await res.json();
 
         return {props:{data}}

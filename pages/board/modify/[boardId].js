@@ -12,7 +12,7 @@ import { deleteUserCookie } from '@/pages/components/common';
 
 const Index = ({data}) => {
 
-    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
     const router = useRouter();
 
     const [board, setBoard] = useState(data.board);
@@ -51,7 +51,7 @@ const Index = ({data}) => {
         }
         
         try{       
-            const res = await fetch(backServer + "/board/" + board.boardId, {
+            const res = await fetch(boardServerDomain + "/board/" + board.boardId, {
                 headers :{
                     accessToken: getCookie("accessToken")
                     ,refreshToken: getCookie("refreshToken")
@@ -90,7 +90,7 @@ const Index = ({data}) => {
         }
         
         try{       
-            const res = await fetch(backServer + "/media/" + mediaId, {
+            const res = await fetch(boardServerDomain + "/media/" + mediaId, {
                 headers :{
                     accessToken: getCookie("accessToken")
                     ,refreshToken: getCookie("refreshToken")
@@ -232,10 +232,12 @@ const Index = ({data}) => {
 
 export async function getServerSideProps(context){
 
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
+
     try{
         let {boardId} = context.query;
 
-        const url = 'http://localhost:8080/board/'+boardId;
+        const url = boardServerDomain + '/board/' + boardId;
         const res = await fetch(url);
         const data = await res.json();
 

@@ -13,6 +13,8 @@ import { deleteUserCookie } from '@/pages/components/common';
 
 const Index = () => { 
 
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
+
     deleteUserCookie();
 
     const router = useRouter(); 
@@ -58,7 +60,7 @@ const Index = () => {
         setValidPassword(true);
 
         try{
-            const res = await fetch('http://localhost:8080/user/login', {
+            const res = await fetch(boardServerDomain + '/user/login', {
                 method:'POST'
                 , headers:{
                     'Content-Type':'application/json',

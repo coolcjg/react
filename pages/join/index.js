@@ -15,6 +15,8 @@ import 'react-calendar/dist/Calendar.css';
 
 const Index = () => {
 
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
+
     const router = useRouter();
     
     const [id, setId] = useState('');
@@ -58,7 +60,7 @@ const Index = () => {
         }
 
         try{
-            const res = await fetch('http://localhost:8080/user/count/?userId='+id);
+            const res = await fetch(boardServerDomain + '/user/count/?userId='+id);
             const data = await res.json();                    
 
             if(data.code == 200){
@@ -144,7 +146,7 @@ const Index = () => {
         }
 
         try{
-            const res = await fetch('http://localhost:8080/user', {
+            const res = await fetch(boardServerDomain + '/user', {
                 method:'POST'
                 , headers:{
                     'Content-Type':'application/json',

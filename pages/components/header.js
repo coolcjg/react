@@ -13,7 +13,7 @@ import { deleteUserCookie } from '@/pages/components/common';
 
 const Header = () => {
 
-    const backServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
 
     const [loaded, setLoaded] = useState(false);
 
@@ -48,7 +48,7 @@ const Header = () => {
         console.log("getAccessTokenByRefreshToken");
 
         try{       
-            const res = await fetch(backServer + "/jwt/accessToken", {
+            const res = await fetch(boardServerDomain + "/jwt/accessToken", {
                 headers :{
                     refreshToken: getCookie("refreshToken")
                 }
