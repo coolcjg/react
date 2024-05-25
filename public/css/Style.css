@@ -114,7 +114,20 @@ th {
     border:1px solid #BDBDBD;
 }
 
+.searchCalendar2{
+    position:absolute;
+    top:20%;
+    left:50%;
+    transform:translateX(-50%);
+    background-color:white;
+    border:1px solid #BDBDBD;
+}
+
 .searchCalendar .close{
+    text-align: right
+}
+
+.searchCalendar2 .close{
     text-align: right
 }
 

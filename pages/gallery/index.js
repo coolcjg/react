@@ -3,6 +3,9 @@ import Header from "../components/header";
 import {useRouter} from 'next/router'
 import 'react-date-range/dist/styles.css'; 
 import 'react-date-range/dist/theme/default.css'; 
+import { DateRange  } from 'react-date-range';
+import CloseButton from 'react-bootstrap/CloseButton';
+import { format } from "date-fns"
 
 const Index = () => {
 
@@ -14,6 +17,23 @@ const Index = () => {
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [lastPage, setLastPage] = useState(false);
+    const [type, setType] = useState('all');
+    const [day, setDay] = useState('all');
+
+    const [showCalendar, setShowCalendar] = useState(false);
+    
+    const [state, setState] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection',
+        }  
+    ])
+
+    const [searchParam, setSearchParam] = useState({searchType:"all", searchText:""});
+
+    const [dateRange, setDateRange] = useState('');
+
     
     useEffect(()=>{
         window.addEventListener('scroll', onScroll)
@@ -74,6 +94,28 @@ const Index = () => {
        
     }
 
+    const changeType = (e) => {
+        setType(e.target.value)
+    }
+
+    const changeDay  = (e) => {
+        setDay(e.target.value)
+
+        if(e.target.value === 'manual'){
+            setShowCalendar(true);
+        }else{
+            setDateRange('')
+        }
+    }
+
+    function changeDate(item){
+        setState([item.selection]);
+        const dateRangeText = format(item.selection.startDate, "yyyy-MM-dd") + "~" + format(item.selection.endDate, "yyyy-MM-dd");
+        setDateRange(dateRangeText);
+
+        console.log(dateRangeText);
+    }    
+
     if(list.length > 0){
 
         return (
@@ -81,6 +123,41 @@ const Index = () => {
                 <Header></Header>
 
                 <div className="contentsDiv">
+
+                    <div className="searchDiv">
+                        <select onChange={changeType} value={type}>
+                            <option value="all">종류</option>
+                            <option value="image">이미지</option>
+                            <option value="video">비디오</option>
+                        </select>
+
+                        <select onChange={changeDay} value={day}>
+                            <option value="all">날짜</option>
+                            <option value="day">1일</option>
+                            <option value="week">1주</option>
+                            <option value="month">1달</option>
+                            <option value="year">1년</option>
+                            <option value="manual">직접 설정</option>
+                        </select>
+
+                        <input type="text" className={day =='manual' ? '' : "d-none"} size="21" value={dateRange}/>
+
+                        <button type="button">검색</button>
+
+                        <div className={"searchCalendar2  justify-content-center " + (showCalendar ? "" : "d-none")}>
+                                    <div className="close">
+                                        <CloseButton onClick={()=> setShowCalendar(false)}/>
+                                    </div>                                    
+                                    <DateRange
+                                        editableDateInputs={true}
+                                        onChange={(item) => changeDate(item)}
+                                        moveRangeOnFirstSelection={false}
+                                        ranges={state}
+                                    />
+                        </div>                        
+                    </div>
+
+
                     <div className="galleryDiv">
 
                         {
