@@ -1,29 +1,80 @@
-import {useState} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import Header from "../components/header";
 import {useRouter} from 'next/router'
 import 'react-date-range/dist/styles.css'; 
 import 'react-date-range/dist/theme/default.css'; 
 
-const Index = (res) => {
+const Index = () => {
 
-    console.log('넘어온 res');
-    console.log(res);
-
-    const backServer = process.env.NEXT_PUBLIC_GALLERY_SERVER;
+    const galleryServerDomain = process.env.NEXT_PUBLIC_GALLERY_SERVER_DOMAIN;
 
     const router = useRouter(); 
 
-    const [pageNumber, setPageNumber] = useState('');
-    const [totalPage, setTotalPage] = useState('');
-    const [thumbList, setThumbList] = useState('');
-    
-    const [list, setList] = useState(res.data);
-    const [error, setError] = useState(res.error);
+    const [pageNumber, setPageNumber] = useState(0);
+    const [list, setList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [lastPage, setLastPage] = useState(false);
+    
+    useEffect(()=>{
+        window.addEventListener('scroll', onScroll)
+        return () => window.removeEventListener('scroll', onScroll);
+    }, [onScroll])
 
-    console.log(list);
+    useEffect(()=>{
+        galleryRequest();
+    }, [])
 
-    if(error == undefined || error == ''){
+    function  onScroll(){
+        const scrollTop = document.documentElement.scrollTop;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollHeight = document.documentElement.scrollHeight;
+        
+        if(scrollTop + clientHeight >= scrollHeight-50){
+            nextPage();
+        }
+    }
+
+    function nextPage(){
+        if(!lastPage){
+            galleryRequest(pageNumber+1)
+        }
+    }
+
+    async function galleryRequest(){
+
+        setLoading(true)
+
+        try{
+
+            const nextPage = pageNumber+1
+            
+            const res = await fetch(galleryServerDomain + '/gallery/list?pageNumber=' + nextPage + '&pageSize=40');
+            const resJson = await res.json();
+
+            if(resJson.data.length > 0){
+
+                resJson.data.forEach(function(gallery, index, array){
+                    setList(list => [...list, gallery]);
+                })
+
+                setPageNumber(nextPage)
+
+                if(resJson.data.length < 40){
+                    setLastPage(true)    
+                }
+            }else{
+                setLastPage(true)
+            }
+            
+        }catch(error){
+            return {props:{data:{code:'500', message:'서버와 연결되지 않았습니다.'}}};
+        }   
+
+        setLoading(false);
+       
+    }
+
+    if(list.length > 0){
 
         return (
             <>
@@ -34,11 +85,9 @@ const Index = (res) => {
 
                         {
                             list.map((item, index) =>(
-                                <>
                                 <div className="item" key={item.galleryId}>
                                     <img src={item.thumbnailFileUrl}></img>
                                 </div>
-                                </>
                             ))
                         }
                       
@@ -58,7 +107,7 @@ const Index = (res) => {
         return (
             <>
                 <Header></Header>
-                <div>{error}</div>
+                <div>자료없음</div>
             </>
         )         
 
@@ -75,28 +124,5 @@ function validParam(query){
         return true;
     }    
 }
-
-export async function getServerSideProps(context){
-
-    const galleryServerDomain = process.env.NEXT_PUBLIC_GALLERY_SERVER_DOMAIN; 
-
-    try{
-
-        if(validParam(context.query)){
-            const res = await fetch(galleryServerDomain + '/gallery/list?pageNumber=' + context.query.pageNumber + '&pageSize=' + context.query.pageSize);
-            const resJson = await res.json();
-            return {props:resJson}            
-        }else{
-            var obj = new Object();
-            obj.error = "paramError"
-            return {props:obj}
-        }
-        
-    }catch(error){
-        return {props:{data:{code:'500', message:'서버와 연결되지 않았습니다.'}}};
-    }
-    
-}
-
 
 export default Index;
