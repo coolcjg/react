@@ -36,7 +36,7 @@ const Index = () => {
 
     function nextPage(){
         if(!lastPage){
-            galleryRequest(pageNumber+1)
+            galleryRequest()
         }
     }
 
