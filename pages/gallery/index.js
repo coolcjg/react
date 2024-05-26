@@ -19,6 +19,7 @@ const Index = () => {
     const [lastPage, setLastPage] = useState(false);
     const [type, setType] = useState('all');
     const [day, setDay] = useState('all');
+    const [dateRange, setDateRange] = useState('');
 
     const [showCalendar, setShowCalendar] = useState(false);
     
@@ -32,16 +33,13 @@ const Index = () => {
 
     const [searchParam, setSearchParam] = useState({searchType:"all", searchText:""});
 
-    const [dateRange, setDateRange] = useState('');
-
-    
     useEffect(()=>{
         window.addEventListener('scroll', onScroll)
         return () => window.removeEventListener('scroll', onScroll);
     }, [onScroll])
 
     useEffect(()=>{
-        galleryRequest();
+        galleryRequest(1);
     }, [])
 
     function  onScroll(){
@@ -56,19 +54,24 @@ const Index = () => {
 
     function nextPage(){
         if(!lastPage){
-            galleryRequest()
+            galleryRequest(pageNumber+1)
         }
     }
 
-    async function galleryRequest(){
+    async function galleryRequest(pageNumber){
 
         setLoading(true)
 
         try{
-
-            const nextPage = pageNumber+1
             
-            const res = await fetch(galleryServerDomain + '/gallery/list?pageNumber=' + nextPage + '&pageSize=40');
+            var url = `${galleryServerDomain}/gallery/list?pageNumber=${pageNumber}&pageSize=40&type=${type}&day=${day}`
+
+            if(day == 'manual'){
+                url = url + `&dateRange=${dateRange}`
+            }
+            
+            
+            const res = await fetch(url);
             const resJson = await res.json();
 
             if(resJson.data.length > 0){
@@ -77,7 +80,7 @@ const Index = () => {
                     setList(list => [...list, gallery]);
                 })
 
-                setPageNumber(nextPage)
+                setPageNumber(pageNumber)
 
                 if(resJson.data.length < 40){
                     setLastPage(true)    
@@ -106,6 +109,12 @@ const Index = () => {
         }else{
             setDateRange('')
         }
+    }
+
+    const search = (e) => {
+        setList([]);
+        setLastPage(false);
+        galleryRequest(1);
     }
 
     function changeDate(item){
@@ -140,9 +149,9 @@ const Index = () => {
                             <option value="manual">직접 설정</option>
                         </select>
 
-                        <input type="text" className={day =='manual' ? '' : "d-none"} size="21" value={dateRange}/>
+                        <input type="text" className={day =='manual' ? '' : "d-none"} size="21" value={dateRange} readOnly/>
 
-                        <button type="button">검색</button>
+                        <button type="button" onClick={(e) => search()}>검색</button>
 
                         <div className={"searchCalendar2  justify-content-center " + (showCalendar ? "" : "d-none")}>
                                     <div className="close">
