@@ -64,7 +64,15 @@ const Index = () => {
 
         try{
             
-            var url = `${galleryServerDomain}/gallery/list?pageNumber=${pageNumber}&pageSize=40&type=${type}&day=${day}`
+            var url = `${galleryServerDomain}/gallery/list?pageNumber=${pageNumber}&pageSize=40`
+
+            if(type != 'all'){
+                url = url + `&type=${type}`
+            }
+
+            if(day != ''){
+                url = url + `&day=${day}`
+            }
 
             if(day == 'manual'){
                 url = url + `&dateRange=${dateRange}`
