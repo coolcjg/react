@@ -133,79 +133,77 @@ const Index = () => {
         console.log(dateRangeText);
     }    
 
-    if(list.length > 0){
+    return (
+        <>
+            <Header></Header>
 
-        return (
-            <>
-                <Header></Header>
+            <div className="contentsDiv">
 
-                <div className="contentsDiv">
+                <div className="searchDiv">
+                    <select onChange={changeType} value={type}>
+                        <option value="all">종류</option>
+                        <option value="image">이미지</option>
+                        <option value="video">비디오</option>
+                    </select>
 
-                    <div className="searchDiv">
-                        <select onChange={changeType} value={type}>
-                            <option value="all">종류</option>
-                            <option value="image">이미지</option>
-                            <option value="video">비디오</option>
-                        </select>
+                    <select onChange={changeDay} value={day}>
+                        <option value="all">날짜</option>
+                        <option value="day">1일</option>
+                        <option value="week">1주</option>
+                        <option value="month">1달</option>
+                        <option value="year">1년</option>
+                        <option value="manual">직접 설정</option>
+                    </select>
 
-                        <select onChange={changeDay} value={day}>
-                            <option value="all">날짜</option>
-                            <option value="day">1일</option>
-                            <option value="week">1주</option>
-                            <option value="month">1달</option>
-                            <option value="year">1년</option>
-                            <option value="manual">직접 설정</option>
-                        </select>
+                    <input type="text" className={day =='manual' ? '' : "d-none"} size="21" value={dateRange} readOnly/>
 
-                        <input type="text" className={day =='manual' ? '' : "d-none"} size="21" value={dateRange} readOnly/>
+                    <button type="button" onClick={(e) => search()}>검색</button>
 
-                        <button type="button" onClick={(e) => search()}>검색</button>
+                    <div className={"searchCalendar2  justify-content-center " + (showCalendar ? "" : "d-none")}>
+                                <div className="close">
+                                    <CloseButton onClick={()=> setShowCalendar(false)}/>
+                                </div>                                    
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={(item) => changeDate(item)}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={state}
+                                />
+                    </div>                        
+                </div>
 
-                        <div className={"searchCalendar2  justify-content-center " + (showCalendar ? "" : "d-none")}>
-                                    <div className="close">
-                                        <CloseButton onClick={()=> setShowCalendar(false)}/>
-                                    </div>                                    
-                                    <DateRange
-                                        editableDateInputs={true}
-                                        onChange={(item) => changeDate(item)}
-                                        moveRangeOnFirstSelection={false}
-                                        ranges={state}
-                                    />
-                        </div>                        
-                    </div>
-
-
+                {
+                    list.length > 0 && 
                     <div className="galleryDiv">
 
-                        {
-                            list.map((item, index) =>(
-                                <div className="item" key={item.galleryId}>
-                                    <img src={item.thumbnailFileUrl}></img>
-                                </div>
-                            ))
-                        }
-                      
+                            {
+                                list.map((item, index) =>(
+                                    <div className="item" key={item.galleryId}>
+                                        <img src={item.thumbnailFileUrl}></img>
+                                    </div>
+                                ))
+                            }
+                        
                     </div>
+                }
+                {
+                    list.length == 0 && 
+                    <div className="galleryDiv">
+                        <div>자료없음</div>
+                    </div>
+                }
 
-                    <div className={"borderDiv " + ((loading ? "" : "d-none"))}>
-                        <div className="spinner-border" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </div>
-                    </div>  
+                <div className={"borderDiv " + ((loading ? "" : "d-none"))}>
+                    <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>  
 
-                </div>
-            </>
-        )        
+            </div>
+        </>
+    )        
 
-    } else {
-        return (
-            <>
-                <Header></Header>
-                <div>자료없음</div>
-            </>
-        )         
-
-    }
+    
 
 };
 
