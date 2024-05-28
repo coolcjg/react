@@ -131,7 +131,16 @@ const Index = () => {
         setDateRange(dateRangeText);
 
         console.log(dateRangeText);
-    }    
+    }
+
+
+    const [mainDisplay, setMainDisplay] = useState(false)
+
+    function openMainContent(){
+        setMainDisplay(!mainDisplay);
+        console.log("openContent")
+    }
+
 
     return (
         <>
@@ -178,7 +187,7 @@ const Index = () => {
 
                             {
                                 list.map((item, index) =>(
-                                    <div className="item" key={item.galleryId}>
+                                    <div className="item" key={item.galleryId} onClick={openMainContent}>
                                         <img src={item.thumbnailFileUrl}></img>
                                     </div>
                                 ))
@@ -192,6 +201,20 @@ const Index = () => {
                         <div>자료없음</div>
                     </div>
                 }
+
+                <div className={"mainContent " + (mainDisplay==false ? 'd-none':'')}>
+                    <div className="closeDiv">
+                        <bottom type="button" className="closeButton btn btn-outline-success" onClick={(e) => setMainDisplay(false)}>닫기</bottom>
+                    </div>
+                    <div className="main">
+                        <video controls width="100%" type="video/mp4">
+                            <source src="http://localhost:7001/upload/encoding/video2.mp4"/>
+                        </video>
+                    </div>
+                    <div className="title">
+                        <h2 href="">제목</h2>
+                    </div>
+                </div>
 
                 <div className={"borderDiv " + ((loading ? "" : "d-none"))}>
                     <div className="spinner-border" role="status">

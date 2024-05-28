@@ -428,3 +428,33 @@ th {
     margin-bottom:30px;
     justify-content: center;
 }
+
+.mainContent{
+    position:fixed;
+    top:10px;
+    left:10px;
+    right:10px;
+    
+    border :1px solid black;
+    border-radius:10px;
+    background-color:rgb(255, 255, 255);   
+
+    padding-bottom:20px;
+}
+
+.mainContent .closeDiv{
+    display:block;
+    text-align: right
+}
+
+.mainContent .closeButton{
+    margin:10px;
+}
+
+.mainContent .main {
+    margin:10px;
+}
+
+.mainContent .title{
+    margin:10px;
+}
