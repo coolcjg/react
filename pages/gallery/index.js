@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback, useRef} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import Header from "../components/header";
 import {useRouter} from 'next/router'
 import 'react-date-range/dist/styles.css'; 
@@ -30,8 +30,6 @@ const Index = () => {
             key: 'selection',
         }  
     ])
-
-    const [searchParam, setSearchParam] = useState({searchType:"all", searchText:""});
 
     useEffect(()=>{
         window.addEventListener('scroll', onScroll)
@@ -136,9 +134,16 @@ const Index = () => {
 
     const [mainDisplay, setMainDisplay] = useState(false)
 
-    function openMainContent(){
-        setMainDisplay(!mainDisplay);
-        console.log("openContent")
+    function openMainContent(item){
+        setMainDisplay(true);
+        setMainContent(item);
+
+        if(item.type == 'video'){
+            mainVideo.current.pause();
+            mainVideo.current.setAttribute('src', item.encodingFileUrl)
+            mainVideo.current.load();
+            mainVideo.current.play();
+        }
     }
 
     useEffect(() => {
@@ -156,6 +161,8 @@ const Index = () => {
 
     const mainRef = useRef(null);
     const mainVideo = useRef(null);
+
+    const [mainContent, setMainContent] = useState('');
 
     return (
         <>
@@ -202,7 +209,7 @@ const Index = () => {
 
                             {
                                 list.map((item, index) =>(
-                                    <div className="item" key={item.galleryId} onClick={openMainContent}>
+                                    <div className="item" key={item.galleryId} onClick={(e) => openMainContent(item)}>
                                         <img src={item.thumbnailFileUrl}></img>
                                     </div>
                                 ))
@@ -221,20 +228,18 @@ const Index = () => {
                     <div className="closeDiv">
                         <bottom type="button" className="closeButton btn btn-outline-success" onClick={(e) => setMainDisplay(false)}>닫기</bottom>
                     </div>
-
                     
-                    <div className="mainVideo" ref={mainRef}>
-                        <video controls ref={mainVideo} type="video/mp4">
-                            <source src="http://localhost:7001/upload/encoding/video2.mp4"/>
+                    <div className={"mainVideo " + (mainContent.type == 'video' ? '' : 'd-none')} ref={mainRef}>
+                        <video autoPlay  controls ref={mainVideo} type="video/mp4">
+                            <source src={mainContent.encodingFileUrl}/>
                         </video>
                     </div>
                     
-                    {/* 
-                    <div className="mainImage">
-                        <img src="http://localhost:7001/upload/encoding/2024/05/25/177.jpg"/>
+                    <div className={"mainImage " + (mainContent.type == 'image' ? '' : 'd-none')}>
+                        <img src={mainContent.encodingFileUrl}/>
                     </div>
-                    */}
-
+                    
+                    
                     <div className="title">
                         <h2 href="">제목</h2>
                     </div>
