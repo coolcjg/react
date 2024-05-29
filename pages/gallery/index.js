@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from 'react';
+import {useState, useEffect, useCallback, useRef} from 'react';
 import Header from "../components/header";
 import {useRouter} from 'next/router'
 import 'react-date-range/dist/styles.css'; 
@@ -141,6 +141,21 @@ const Index = () => {
         console.log("openContent")
     }
 
+    useEffect(() => {
+        window.addEventListener("resize", handleResize);
+        return () => {
+            // cleanup
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
+
+    const handleResize = () => {
+
+        console.log("handleResize");
+    };
+
+    const mainRef = useRef(null);
+    const mainVideo = useRef(null);
 
     return (
         <>
@@ -206,11 +221,20 @@ const Index = () => {
                     <div className="closeDiv">
                         <bottom type="button" className="closeButton btn btn-outline-success" onClick={(e) => setMainDisplay(false)}>닫기</bottom>
                     </div>
-                    <div className="main">
-                        <video controls width="100%" type="video/mp4">
+
+                    
+                    <div className="mainVideo" ref={mainRef}>
+                        <video controls ref={mainVideo} type="video/mp4">
                             <source src="http://localhost:7001/upload/encoding/video2.mp4"/>
                         </video>
                     </div>
+                    
+                    {/* 
+                    <div className="mainImage">
+                        <img src="http://localhost:7001/upload/encoding/2024/05/25/177.jpg"/>
+                    </div>
+                    */}
+
                     <div className="title">
                         <h2 href="">제목</h2>
                     </div>
