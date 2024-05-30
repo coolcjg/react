@@ -10,6 +10,7 @@ import { format } from "date-fns"
 const Index = () => {
 
     const galleryServerDomain = process.env.NEXT_PUBLIC_GALLERY_SERVER_DOMAIN;
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
 
     const router = useRouter(); 
 
@@ -134,7 +135,14 @@ const Index = () => {
 
     const [mainDisplay, setMainDisplay] = useState(false)
 
-    function openMainContent(item){
+    async function openMainContent(item){
+
+        const res = await fetch(boardServerDomain + '/media/' + item.mediaId);
+        const data = await res.json();
+
+        item["title"] = data.data.title;
+        item["boardUrl"] = '/board/' + data.data.boardId
+
         setMainDisplay(true);
         setMainContent(item);
 
@@ -241,7 +249,7 @@ const Index = () => {
                     
                     
                     <div className="title">
-                        <h2 href="">제목</h2>
+                        <h2 onClick={(e) => router.push(mainContent.boardUrl)}>{mainContent.title}</h2>
                     </div>
                 </div>
 
