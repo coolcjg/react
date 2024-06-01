@@ -128,8 +128,6 @@ const Index = () => {
         setState([item.selection]);
         const dateRangeText = format(item.selection.startDate, "yyyy-MM-dd") + "~" + format(item.selection.endDate, "yyyy-MM-dd");
         setDateRange(dateRangeText);
-
-        console.log(dateRangeText);
     }
 
 
@@ -163,8 +161,6 @@ const Index = () => {
     }, []);
 
     const handleResize = () => {
-
-        console.log("handleResize");
     };
 
     const mainRef = useRef(null);
@@ -172,43 +168,103 @@ const Index = () => {
 
     const [mainContent, setMainContent] = useState('');
 
+
+    const [galleryIds, setGalleryIds] = useState([]);
+    
+    function check(id){
+        const isChecked = galleryIds.includes(id);
+
+        if(isChecked){
+            setGalleryIds((prev) => prev.filter((el) => el !== id));
+        }else{
+            setGalleryIds((prev) => [...prev, id]);
+        }
+    }   
+
+    const deleteGallery = async () =>{
+        if(galleryIds.length == 0){
+            alert('선택된 게시물이 없습니다.');
+            return;
+        }
+
+        const bodyParam = {galleryIds: galleryIds, galleryId:1};
+        const res = await fetch(galleryServerDomain + "/gallery", {
+            headers :{
+                /*
+                accessToken: getCookie("accessToken")
+                ,refreshToken: getCookie("refreshToken")
+                */
+                'Content-Type':'application/json'
+            }
+            , method:'DELETE'
+            ,body : JSON.stringify(bodyParam)
+        });
+
+        const data = await res.json();        
+
+        if(data.message == "success"){
+            setGalleryIds((prev) => prev.filter((el) => galleryIds.indexOf(el) == -1))
+            setList((prev) => prev.filter((el) => galleryIds.indexOf(el.galleryId) == -1))
+        }
+        
+    }
+
+    function checkAll(e){
+        if(galleryIds.length != list.length){
+            const idArray = [];
+            list.forEach((el) => idArray.push(el.galleryId));
+            setGalleryIds(idArray);
+        }else{
+            setGalleryIds([]);
+        }
+    }
+
     return (
         <>
             <Header></Header>
 
             <div className="contentsDiv">
 
-                <div className="searchDiv">
-                    <select onChange={changeType} value={type}>
-                        <option value="all">종류</option>
-                        <option value="image">이미지</option>
-                        <option value="video">비디오</option>
-                    </select>
+                <div className="funcDiv">
 
-                    <select onChange={changeDay} value={day}>
-                        <option value="all">날짜</option>
-                        <option value="day">1일</option>
-                        <option value="week">1주</option>
-                        <option value="month">1달</option>
-                        <option value="year">1년</option>
-                        <option value="manual">직접 설정</option>
-                    </select>
+                    <div className="searchDiv">
+                        <select onChange={changeType} value={type}>
+                            <option value="all">종류</option>
+                            <option value="image">이미지</option>
+                            <option value="video">비디오</option>
+                        </select>
 
-                    <input type="text" className={day =='manual' ? '' : "d-none"} size="21" value={dateRange} readOnly/>
+                        <select onChange={changeDay} value={day}>
+                            <option value="all">날짜</option>
+                            <option value="day">1일</option>
+                            <option value="week">1주</option>
+                            <option value="month">1달</option>
+                            <option value="year">1년</option>
+                            <option value="manual">직접 설정</option>
+                        </select>
 
-                    <button type="button" onClick={(e) => search()}>검색</button>
+                        <input type="text" className={day =='manual' ? '' : "d-none"} size="21" value={dateRange} readOnly/>
 
-                    <div className={"searchCalendar2  justify-content-center " + (showCalendar ? "" : "d-none")}>
-                                <div className="close">
-                                    <CloseButton onClick={()=> setShowCalendar(false)}/>
-                                </div>                                    
-                                <DateRange
-                                    editableDateInputs={true}
-                                    onChange={(item) => changeDate(item)}
-                                    moveRangeOnFirstSelection={false}
-                                    ranges={state}
-                                />
-                    </div>                        
+                        <button type="button" onClick={(e) => search()}>검색</button>
+
+                        <div className={"searchCalendar2  justify-content-center " + (showCalendar ? "" : "d-none")}>
+                                    <div className="close">
+                                        <CloseButton onClick={()=> setShowCalendar(false)}/>
+                                    </div>                                    
+                                    <DateRange
+                                        editableDateInputs={true}
+                                        onChange={(item) => changeDate(item)}
+                                        moveRangeOnFirstSelection={false}
+                                        ranges={state}
+                                    />
+                        </div>
+                    </div>
+
+                    <div className="buttonDiv">
+                        <button type="button" className="btn btn-outline-primary" onClick={(e) => checkAll()}>{galleryIds.length != list.length ? "전체선택" : "전체해제"}</button>
+                        <button type="button" className="btn btn-outline-danger" onClick={(e) => deleteGallery()}>삭제</button>
+                    </div>
+
                 </div>
 
                 {
@@ -218,7 +274,14 @@ const Index = () => {
                             {
                                 list.map((item, index) =>(
                                     <div className="item" key={item.galleryId} onClick={(e) => openMainContent(item)}>
-                                        <img src={item.thumbnailFileUrl}></img>
+                                        <div className="item2">
+                                            <div className="form-check" onClick={(e) => {e.stopPropagation()}}>
+                                                <input className="form-check-input" type="checkbox" value={item.galleryId} 
+                                                    checked={galleryIds.includes(item.galleryId) ? true : false} id="flexCheckDefault"
+                                                    onChange={(e)=>{check(item.galleryId)}}/>
+                                            </div>
+                                            <img src={item.thumbnailFileUrl}></img>
+                                        </div>
                                     </div>
                                 ))
                             }
