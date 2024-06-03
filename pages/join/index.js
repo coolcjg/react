@@ -11,6 +11,7 @@ import moment from 'moment'
 import crypto from "crypto"
 import Router, {useRouter} from 'next/router'
 import 'react-calendar/dist/Calendar.css';
+import { GSP_NO_RETURNED_VALUE } from 'next/dist/lib/constants';
 
 
 const Index = () => {
@@ -34,7 +35,8 @@ const Index = () => {
     const [today, setToday] = useState(new Date());
     const [birthDay, setBirthDay] = useState('');
     const [calendarShow, setCalendarShow] = useState('d-none');
-   
+
+    const [auth, setAuth] = useState("");
 
     function showCalendar(){
         if(calendarShow === 'd-none'){
@@ -143,6 +145,11 @@ const Index = () => {
         if(birthDay === ''){
             alert('생일을 선택해주세요.');
             return;
+        }       
+
+        if(auth == ""){
+            alert('권한을 선택해주세요.');
+            return;
         }
 
         try{
@@ -156,6 +163,7 @@ const Index = () => {
                     , password : crypto.createHash('sha256').update(password1).digest('hex')
                     , name : name
                     , birthDay : birthDay
+                    , auth : auth
                 })
             });
             
@@ -204,7 +212,15 @@ const Index = () => {
                                 <Form.Control type="password" placeholder="비밀번호 확인" value={password2} onChange={(event) => checkPasswordEqual(event.target.value)} isInvalid={!equalPassword}/>
                                 <Form.Control.Feedback type="invalid">
                                 {'비밀번호가 맞지 않습니다'}
-                                </Form.Control.Feedback>                                 
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group className="mb-3" controlId="auth">
+                                <Form.Select value={auth} onChange={(e) => setAuth(e.target.value)}>
+                                    <option value="">권한</option>
+                                    <option value="admin">관리자</option>
+                                    <option value="user">사용자</option>
+                                </Form.Select>
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="name">
