@@ -1,7 +1,15 @@
-import {useState, useEffect, useRef} from 'react';
+import {useState, useEffect} from 'react';
 import Header from "../components/header";
 
 const Index = () => {
+
+    const [list, setList]  = useState([]);
+    const [userIds, setUserIds] = useState([]);
+    const [pagination, setPagination] = useState([]);
+    const [prevList, setPrevList] = useState("");
+    const [nextList, setNextList] = useState("");
+    const [pageNumber, setPageNumber] = useState("");
+    const [totalPages, setTotalPages] = useState(0);
 
     const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
 
@@ -13,65 +21,125 @@ const Index = () => {
 
         try{
             
-            var url = `${boardServerDomain}/user/list?pageNumber=${pageNumber}&pageSize=40`           
+            var url = `${boardServerDomain}/user/list?pageNumber=${pageNumber}&pageSize=2`           
             
             const res = await fetch(url);
             const resJson = await res.json();
 
-            if(resJson.data.length > 0){
-                resJson.data.forEach(function(gallery, index, array){
-                    setList(list => [...list, gallery]);
-                });
-            }
+            setList(resJson.data.list);
+            setPagination(resJson.data.pagination);
+            setPrevList(resJson.data.prevList);
+            setNextList(resJson.data.nextList);
+            setPageNumber(pageNumber);
+            setTotalPages(resJson.data.totalPages);
             
         }catch(error){
             alert('서버 에러 발생');
-            
+            console.log(error)
         }          
     }    
+
+    function checkAll(e){
+        if(userIds.length != list.length){
+            const idArray = [];
+            list.forEach((el) => idArray.push(el.userId));
+            setUserIds(idArray);
+        }else{
+            setUserIds([]);
+        }
+    }
+    
+    function check(id){
+        const isChecked = userIds.includes(id);
+
+        if(isChecked){
+            setUserIds((prev) => prev.filter((el) => el !== id));
+        }else{
+            setUserIds((prev) => [...prev, id]);
+        }
+    }      
 
     return (
         <>
             <Header></Header>
 
             <div className="tableDiv">
-                <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                    <th scope="col"></th>
-                    <th scope="col">아이디</th>
-                    <th scope="col">이름</th>
-                    <th scope="col">권한</th>
-                    <th scope="col">등록일</th>
+                <table className="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" onChange={e => checkAll(e)}
+                                    checked = {list.length == userIds.length && userIds.length > 0  ? true : false}
+                                />
+                            </th>
+                            <th scope="col">아이디</th>
+                            <th scope="col">이름</th>
+                            <th scope="col">권한</th>
+                            <th scope="col">등록일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            list.length > 0  &&
+                            
+                            list.map((user) =>(
+                                <tr key={user.userId}>
+                                    <th scope="row">
+                                            <input className="form-check-input" type="checkbox" id="flexCheckDefault" value={user.userId} 
+                                            checked={userIds.includes(user.userId) ? true : false} onChange={(e)=>{check(user.userId)}}/>
+                                    </th>
+                                    <td>{user.userId}</td>
+                                    <td>{user.name}</td>
+                                    <td>{user.auth}</td>
+                                    <td>{user.regDate}</td>
+                                </tr>
+                            ))
+                        }
+                    </tbody>
+                </table>
 
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    </tr>
+                {
+                    list.length > 0 &&
+                    <div>
+                        <nav aria-label="Page navigation example" >
+                            <ul className="pagination justify-content-center">
 
-                    <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    <td>@mdo</td>
-                    </tr>
+                                <li className={"page-item " + (prevList == "" ? "disabled":"")}>
+                                    <a className="page-link" href="#" aria-label="Previous" onClick={(e) => userListRequest(1)}>
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
 
-                    <tr>
-                    <th scope="row">3</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    <td>@mdo</td>
-                    </tr>
-                </tbody>
-                </table>                
+                                <li className={"page-item " + (prevList == "" ? "disabled":"")}>
+                                    <a className="page-link" href="#" aria-label="Previous" onClick={(e) => userListRequest(pageNumber-1)}>
+                                        <span aria-hidden="true">&lt;</span>
+                                    </a>
+                                </li>                                
+
+                                {
+                                    pagination.length > 0 &&
+                                        pagination.map((page) => (
+                                            <li key={page} className={"page-item " + (page == pageNumber ? "active":"")} onClick={(e) => userListRequest(page)}>
+                                                <a className="page-link" href="#">{page}</a>
+                                            </li>
+                                        ))
+                                }
+
+                                <li className={"page-item " + (nextList == "" ? "disabled":"")}>
+                                    <a className="page-link" href="#" aria-label="Next" onClick={(e) => userListRequest(pageNumber+1)}>
+                                        <span aria-hidden="true">&gt;</span>
+                                    </a>
+                                </li>                                
+
+                                <li className={"page-item " + (nextList == "" ? "disabled":"")}>
+                                    <a className="page-link" href="#" aria-label="Next" onClick={(e) => userListRequest(totalPages)}>
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                }
 
             </div>
         </>
