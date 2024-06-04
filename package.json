@@ -21,6 +21,7 @@
     "react-calendar": "^4.6.1",
     "react-date-range": "^2.0.0-alpha.4",
     "react-dom": "^18",
+    "react-router-dom": "^6.23.1",
     "sass": "^1.69.5",
     "ws": "^8.16.0"
   },

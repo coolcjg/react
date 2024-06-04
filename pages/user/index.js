@@ -83,20 +83,23 @@ const Index = () => {
                             list.length > 0  &&
                             
                             list.map((user) =>(
-                                <tr key={user.userId}>
+                                <tr key={user.userId} className="">
+                                    
                                     <th scope="row">
                                             <input className="form-check-input" type="checkbox" id="flexCheckDefault" value={user.userId} 
                                             checked={userIds.includes(user.userId) ? true : false} onChange={(e)=>{check(user.userId)}}/>
                                     </th>
-                                    <td>{user.userId}</td>
+                                    <td><a href={"/user/" + user.userId}>{user.userId}</a></td>
                                     <td>{user.name}</td>
                                     <td>{user.auth}</td>
                                     <td>{user.regDate}</td>
+                                    
                                 </tr>
                             ))
                         }
                     </tbody>
                 </table>
+
 
                 {
                     list.length > 0 &&
