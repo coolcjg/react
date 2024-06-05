@@ -187,7 +187,7 @@ const Index = () => {
             return;
         }
 
-        const bodyParam = {galleryIds: galleryIds, galleryId:1};
+        const bodyParam = {galleryIds: galleryIds};
         const res = await fetch(galleryServerDomain + "/gallery", {
             headers :{
                 /*

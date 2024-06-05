@@ -508,8 +508,19 @@ th {
     margin-right:10px;
 }
 
+.userListButtonDiv{
+    margin:20px;
+    display:flex;
+    justify-content: flex-end;
+
+}
+
 .tableDiv{
-    margin : 30px;
+    margin : 20px;
+}
+
+.tableDiv td{
+    text-align:center
 }
 
 .center{
