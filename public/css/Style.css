@@ -511,3 +511,8 @@ th {
 .tableDiv{
     margin : 30px;
 }
+
+.center{
+    margin:20px;
+    text-align: center;
+}

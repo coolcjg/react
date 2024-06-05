@@ -84,6 +84,7 @@ const Index = () => {
                 setCookie('refreshToken', data.refreshToken);
                 setCookie('id', data.id);
                 setCookie('name', data.name);
+                setCookie('auth', data.auth);
 
                 router.push({pathname:"/"});
             }else{
@@ -91,8 +92,6 @@ const Index = () => {
             }
 
         }catch(error){
-            console.log("error");
-            console.log(error);
             alert('서버응답이 없습니다.');            
         }
 

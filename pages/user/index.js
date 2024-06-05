@@ -1,5 +1,8 @@
 import {useState, useEffect} from 'react';
 import Header from "../components/header";
+import { isAdminAuth } from '@/pages/components/common';
+import {useRouter} from 'next/router'
+import {getCookie, setCookie, deleteCookie } from 'cookies-next'
 
 const Index = () => {
 
@@ -10,20 +13,35 @@ const Index = () => {
     const [nextList, setNextList] = useState("");
     const [pageNumber, setPageNumber] = useState("");
     const [totalPages, setTotalPages] = useState(0);
+    const [show, setShow] = useState(false);
 
+    const router = useRouter();
     const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
 
     useEffect(()=>{
-        userListRequest(1);
+        console.log("adminAuth : " + isAdminAuth());
+        if(isAdminAuth()){
+            setShow(true);
+            userListRequest(1);
+        }else{
+            router.push("/error/auth");
+        }
     }, [])
 
     async function userListRequest(pageNumber){
 
         try{
             
-            var url = `${boardServerDomain}/user/list?pageNumber=${pageNumber}&pageSize=2`           
+            var url = `${boardServerDomain}/user/list?pageNumber=${pageNumber}&pageSize=10`           
             
-            const res = await fetch(url);
+            const res = await fetch(url, {
+                headers :{
+                    accessToken: getCookie("accessToken")
+                    ,refreshToken: getCookie("refreshToken")
+                }
+                , method:'GET'
+            });
+
             const resJson = await res.json();
 
             setList(resJson.data.list);
@@ -60,6 +78,8 @@ const Index = () => {
     }      
 
     return (
+
+        show &&
         <>
             <Header></Header>
 

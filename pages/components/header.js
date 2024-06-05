@@ -20,6 +20,7 @@ const Header = () => {
     const router = useRouter();
     const [id, setId] = useState("");
     const [name, setName] = useState("");
+    const [auth, setAuth] = useState("");
     
     useEffect(()=>{
         setLoaded(true);
@@ -28,7 +29,8 @@ const Header = () => {
         const name = getCookie("name");
 
         setId(id);
-        setName(name);   
+        setName(name);
+        setAuth(getCookie("auth"));        
 
         if(id != undefined){
             getAccessTokenByRefreshToken();
@@ -40,7 +42,14 @@ const Header = () => {
 
     function logout(){
         deleteUserCookie();
+        initUser();
         router.push({pathname:"/"});
+    }
+
+    function initUser(){
+        setId("");
+        setName("");
+        setAuth("");
     }
 
     async function getAccessTokenByRefreshToken(){
@@ -85,7 +94,10 @@ const Header = () => {
                         <Nav.Link onClick={()=> router.push({pathname:"/chat"})}>채팅방</Nav.Link>
                         <Nav.Link onClick={()=> router.push({pathname:"/alarm"})}>알람</Nav.Link>
                         <Nav.Link onClick={()=> router.push({pathname:"/gallery"})}>갤러리</Nav.Link>
-                        <Nav.Link onClick={()=> router.push({pathname:"/user"})}>사용자</Nav.Link>
+                        {
+                            (auth === "admin") &&
+                                <Nav.Link onClick={()=> router.push({pathname:"/user"})}>사용자</Nav.Link>
+                        }
                     </Nav>
 
                     {
