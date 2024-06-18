@@ -116,7 +116,7 @@ const Index = (data) => {
 
                 if(data.message == "success"){
                     alert('사용자 정보가 변경됐습니다.');
-                    router.push("/")
+                    router.push("/user");
                 }
     
             }catch(e){

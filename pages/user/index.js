@@ -97,15 +97,10 @@ const Index = () => {
         });
 
         const data = await res.json();
-
+        
         if(data.message == "success"){
             alert('유저 삭제가 완료됐습니다.');
-
-            if(list.length == userIds.length){
-                let newPageNumber = pageNumber-1 == 0 ? 1 : pageNumber-1;
-                userListRequest(newPageNumber);
-            }
-
+            userListRequest(1);
         }
         
     }
