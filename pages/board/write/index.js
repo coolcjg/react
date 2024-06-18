@@ -69,7 +69,7 @@ const Index = () => {
 
             const data = await res.json();
 
-            if(data.code === 201){
+            if(data.message === "success"){
                 alert("게시물이 등록되었습니다");
                 router.push("/board");
             }else if(data.code === 401){

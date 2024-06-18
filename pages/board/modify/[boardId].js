@@ -62,7 +62,7 @@ const Index = ({data}) => {
 
             const data = await res.json();
 
-            if(data.code === 200){
+            if(data.message === "success"){
                 alert("게시물이 수정되었습니다");
                 router.push("/board/" + board.boardId);
             }else if(data.code === 401){
@@ -100,7 +100,7 @@ const Index = ({data}) => {
 
             const data = await res.json();
 
-            if(data.code === 200){
+            if(data.message === "success"){
                 alert("미디어가 삭제되었습니다");
                 const newMediaList = board.mediaDTOList.filter(media => media.mediaId != mediaId)
                 setBoard({...board, mediaDTOList:newMediaList});

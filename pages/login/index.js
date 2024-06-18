@@ -76,7 +76,7 @@ const Index = () => {
             console.log("login result data");
             console.log(data);
 
-            if(data.code == "200"){
+            if(data.message == "success"){
                 
                 const token = res.headers.get('Set-Cookie');
 
@@ -88,7 +88,7 @@ const Index = () => {
 
                 router.push({pathname:"/"});
             }else{
-                alert('로그인중 문제가 발생하였습니다. : ' + data.code);
+                alert('로그인중 문제가 발생하였습니다. : ' + data.message);
             }
 
         }catch(error){

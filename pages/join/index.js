@@ -65,7 +65,7 @@ const Index = () => {
             const res = await fetch(boardServerDomain + '/user/count/?userId='+id);
             const data = await res.json();                    
 
-            if(data.code == 200){
+            if(data.message == "success"){
 
                 if(data.count == 0){
                     alert('사용 가능한 아이디입니다.');
@@ -77,7 +77,7 @@ const Index = () => {
                 }
 
             }else{
-                alert('서버 에러 발생');
+                alert('서버 에러가 발생했습니다 : ' + message);
             }
 
         }catch(error){
@@ -169,11 +169,11 @@ const Index = () => {
             
             const data = await res.json();
 
-            if(data.code == "200"){
+            if(data.message == "success"){
                 alert('회원가입이 성공했습니다.');
                 router.push({pathname:"/"});    
             }else{
-                alert('회원가입 도중 문제가 발생하였습니다. : ' + data.code);
+                alert('회원가입 도중 문제가 발생하였습니다. : ' + data.message);
             }
 
         }catch(error){

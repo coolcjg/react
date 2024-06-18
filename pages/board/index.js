@@ -70,11 +70,6 @@ const Index = ({data}) => {
     }
 
     async function search(){
-
-        if(searchParam.searchText.trim() === ""){
-            alert('검색어를 입력하세요.');
-            return;
-        }
         
         try{
             const param = 'searchType=' + searchParam.searchType + '&searchText=' + searchParam.searchText;
@@ -144,7 +139,7 @@ const Index = ({data}) => {
 
     }
 
-    if(data.code == 200){
+    if(data.message == "success"){
 
         return (
             <>
