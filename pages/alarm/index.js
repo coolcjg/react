@@ -30,7 +30,7 @@ const Index = () => {
 
             const data = await res.json();
 
-            if(data.code == 200){
+            if(data.message == "success"){
 
                 const newAlarm = alarm.map((e, index) =>{
                     if(e.alarmId == alarmParam.alarmId){
@@ -142,6 +142,9 @@ const Index = () => {
 
                 setAlarm(data.list);
                 setCount(data.count);
+            }else if(data.message == "ExpiredJwtException"){
+                alert('로그인 시간이 초과됐습니다. 재로그인 하세요.');
+                router.push("/login");
             }else{
                 console.error('serverError :  code : ' +  data.code + ', message : ' + data.message);
             }
