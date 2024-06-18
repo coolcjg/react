@@ -1,11 +1,15 @@
-import React from 'react'
+import React, {useCallback } from 'react'
 import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import Header from "../components/header";
 import {useState, useRef, useEffect} from 'react';
 import {Client} from '@stomp/stompjs'
+import {useRouter} from 'next/router'
+import {useLocation} from 'react-router-dom'
 
 const Index = ({}) => {
+
+    const chatServerDomain = process.env.NEXT_PUBLIC_CHAT_SERVER_DOMAIN;
 
     const [roomId, setRoomId] = useState('');
     const [userId, setUserId] = useState('');
@@ -32,6 +36,8 @@ const Index = ({}) => {
     const [displayUserList, setDisplayUserList] = useState(false);
     const [userList, setUserList] = useState([]);
 
+    const router = useRouter(); 
+
     async function initChat(){
 
         if(roomId === ''){
@@ -45,7 +51,7 @@ const Index = ({}) => {
         }
         
         try{   
-            const url = 'http://localhost:8100/isMember?roomId=' + roomId + "&userId=" + userId;
+            const url = chatServerDomain + '/isMember?roomId=' + roomId + "&userId=" + userId;
             const res = await fetch(url);
             const data = await res.json();
 
@@ -60,7 +66,7 @@ const Index = ({}) => {
         }   
 
         const newClient = new Client({
-            brokerURL : 'ws://localhost:8100/ws',
+            brokerURL : 'ws://' + chatServerDomain.replace("http://", "")+'/ws',
             connectHeaders: {
                 userId: userId,
                 roomId : roomId,
@@ -238,7 +244,45 @@ const Index = ({}) => {
 
     useEffect(()=>{
         chatBodyDiv.current.scrollTop = chatBodyDiv.current.scrollHeight;
-    }, [chatList])     
+    }, [chatList]) 
+
+    const routeChangeStart = useCallback(
+        (url) => {
+    
+            if(url == router.asPath){
+                return;
+            }
+            
+            const result = exitChat();
+
+            if(result != true){
+                router.events.emit("routeChangeError");
+                throw "routeChange aborted.";
+            }
+        },
+      );    
+
+    useEffect(() => {
+        router.events.on('routeChangeStart', routeChangeStart);
+        return () => {
+          router.events.off('routeChangeStart', routeChangeStart);
+        };
+    }, [routeChangeStart, router.events]);
+
+    function exitChat(){
+        if(confirm('채팅방을 나가시겠습니까?')){
+            if(client != null){
+                client.deactivate();
+                setClient(client);
+                setUserList([]);
+                setChatList([]);                
+            }
+            return true;
+        }else{
+            return false;
+        }
+        
+    }
     
     return (
         <>
@@ -253,6 +297,7 @@ const Index = ({}) => {
 
                         <div className="userButtonDiv">
                             <button type="button" className="btn btn-outline-secondary" onClick={e => setDisplayUserList(!displayUserList)}>접속자 리스트</button>
+                            <button type="button" className="btn btn-outline-secondary" onClick={e => exitChat()}>나가기</button>
                         </div>                        
 
                     </div>

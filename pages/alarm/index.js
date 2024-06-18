@@ -8,8 +8,8 @@ import 'react-date-range/dist/theme/default.css';
 
 const Index = () => {
 
-    const backServer = process.env.NEXT_PUBLIC_ALARM_SERVER;
-    const travelingServer = process.env.NEXT_PUBLIC_BACK_SERVER;
+    const alarmServerDomain = process.env.NEXT_PUBLIC_ALARM_SERVER_DOMAIN;
+    const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
     const router = useRouter(); 
 
     const [alarm, setAlarm] = useState([]);
@@ -20,7 +20,7 @@ const Index = () => {
     async function checkAlarm(alarmParam){
 
         try{
-            const res = await fetch(travelingServer + "/alarm/check/" + alarmParam.alarmId, {
+            const res = await fetch(boardServerDomain + "/alarm/check/" + alarmParam.alarmId, {
                 headers :{
                     accessToken: getCookie("accessToken")
                     ,refreshToken: getCookie("refreshToken")
@@ -64,7 +64,7 @@ const Index = () => {
 
         try{
 
-            const res = await fetch(travelingServer + "/alarm/" + alarmId, {
+            const res = await fetch(boardServerDomain + "/alarm/" + alarmId, {
                 headers :{
                     accessToken: getCookie("accessToken")
                     ,refreshToken: getCookie("refreshToken")
@@ -74,8 +74,8 @@ const Index = () => {
 
             if(res.ok === true){
                 const data = await res.json();
-            
-                if(data.code == 200){
+
+                if(data.message == "success"){
                     list(id);
                 }else{
                     console.error('serverError :  code : ' +  data.code + ', message : ' + data.message);
@@ -94,7 +94,7 @@ const Index = () => {
 
             list(id);
 
-            const eventSource = new EventSource(backServer + "/sse?userId=" + id);
+            const eventSource = new EventSource(alarmServerDomain + "/sse?userId=" + id);
         
             eventSource.addEventListener("alarm", function(event){           
                 const message = JSON.parse(event.data);
@@ -125,7 +125,7 @@ const Index = () => {
     async function list(userId){
 
         try{
-            const res = await fetch(travelingServer + "/alarm/list?userId=" + userId, {
+            const res = await fetch(boardServerDomain + "/alarm/list?userId=" + userId, {
                 headers :{
                     accessToken: getCookie("accessToken")
                     ,refreshToken: getCookie("refreshToken")
@@ -135,7 +135,7 @@ const Index = () => {
 
             const data = await res.json();
 
-            if(data.code == 200){
+            if(data.message == "success"){
                 data.list.map((temp, index) => {
                     temp["message"] = getAlarmMessage(temp);
                 });
