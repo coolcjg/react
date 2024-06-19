@@ -33,3 +33,4 @@ jobs:
         run: npm run build
 
       - name: Make zip file
+        run: zip -qq -r ./chagok.zip . -x "node_modules/*"
