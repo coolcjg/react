@@ -18,7 +18,7 @@ import 'react-calendar/dist/Calendar.css';
 import { isAdminAuth } from '@/common/common.js';
 
 
-const Index = (data) => {
+const Index = (data) => {  
 
     const router = useRouter();
 
