@@ -13,4 +13,4 @@ else
 fi
 
 cd /home/ec2-user/test
-npm run start &
+~/.nvm/versions/node/v20.14.0/bin/npm run start &
