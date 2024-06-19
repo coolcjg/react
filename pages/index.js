@@ -6,7 +6,7 @@ const Index = ({data}) => {
     return (
         <>
             <Header></Header>
-            <div className="center">HELLO WORLD7788</div>
+            <div className="center">HELLO WORLD7799</div>
         </>
     )
 };
