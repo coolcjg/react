@@ -8,7 +8,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import {useRouter} from 'next/router'
 import Card from 'react-bootstrap/Card';
-import { deleteUserCookie } from '@/pages/components/common';
+import { deleteUserCookie } from '@/common/common.js';
 
 const Index = ({data}) => {
 

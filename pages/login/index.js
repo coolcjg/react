@@ -9,7 +9,7 @@ import Button from 'react-bootstrap/Button';
 import crypto from "crypto"
 import Router, {useRouter} from 'next/router'
 import {setCookie} from 'cookies-next'
-import { deleteUserCookie } from '@/pages/components/common';
+import { deleteUserCookie } from '@/common/common.js';
 
 const Index = () => { 
 

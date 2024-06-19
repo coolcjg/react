@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import Header from "../components/header";
-import { isAdminAuth } from '@/pages/components/common';
+import { isAdminAuth } from '@/common/common.js';
 import {useRouter} from 'next/router'
 import {getCookie, setCookie, deleteCookie } from 'cookies-next'
 

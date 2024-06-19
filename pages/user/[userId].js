@@ -15,7 +15,7 @@ import moment from 'moment'
 import crypto from "crypto"
 import 'react-calendar/dist/Calendar.css';
 
-import { isAdminAuth } from '@/pages/components/common';
+import { isAdminAuth } from '@/common/common.js';
 
 
 const Index = (data) => {

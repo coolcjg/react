@@ -9,7 +9,7 @@ import Router, {useRouter} from 'next/router'
 import {useEffect, useState, useLayoutEffect} from 'react';
 import {getCookie, setCookie, deleteCookie } from 'cookies-next'
 import '../../public/css/Style.css'
-import { deleteUserCookie } from '@/pages/components/common';
+import { deleteUserCookie } from '@/common/common.js';
 
 const Header = () => {
 
