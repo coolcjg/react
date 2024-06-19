@@ -9,7 +9,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Calendar from 'react-calendar'
 
 import {useRouter} from 'next/router'
-import {getCookie} from 'cookies-next'
+import {getCookie} from 'cookies-next' 
 
 import moment from 'moment'
 import crypto from "crypto" 
