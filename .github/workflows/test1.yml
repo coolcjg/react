@@ -1,56 +1,13 @@
-name: deploy to S3
-
+name: Staging # 워크플로 Action의 이름
 on:
   push:
-    branches:
-      - main
-
-env:
-  S3_BUCKET_NAME: cjgbucket
-  CODE_DEPLOY_APPLICATION_NAME: cjg-react
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: react
-
+    branches: [main] #github main 브런치에 푸시 발생 시 실행 ( main 외 다른브런치 이용시 이름변경)
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.9.0]
-
+  staging: #staging이라는 작업
+    name: deploy to staging # 작업의 이름
+    runs-on: ubuntu-latest # 실행될 작업환경을 말함.
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      # 프로젝트 빌드
-      - name: Build next app
-        run: npm run build
-
-      - name: Make zip file
-        run: zip -qq -r ./chagok.zip . -x "node_modules/*"
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-
-      - name: Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./chagok.zip s3://$S3_BUCKET_NAME/chagok.zip
-
-      - name: Code Deploy
-        run: |
-          aws deploy create-deployment \
-          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-          --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=chagok.zip        
-
-
+        uses: actions/checkout@v3 #체크아웃 받기
+      - name: HelloWorld
+        uses: actions/hello-world-javascript-action@v1 # 헬로월드 찍어보기
