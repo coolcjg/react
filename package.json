@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "build-dev": "env-cmd -f .env.dev next build",
+    "dev": "env-cmd -f .env.dev next dev",
+
+    "build": "env-cmd -f .env.prod next build",
+    "start": "env-cmd -f .env.prod next start",
+
     "lint": "next lint"
   },
   "dependencies": {
@@ -14,6 +17,7 @@
     "bootstrap-icons": "^1.11.2",
     "cookies-next": "^4.1.0",
     "date-fns": "^3.1.0",
+    "env-cmd": "^10.1.0",
     "moment": "^2.29.4",
     "next": "14.0.2",
     "react": "^18.2.0",
