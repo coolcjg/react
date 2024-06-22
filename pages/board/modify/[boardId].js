@@ -12,6 +12,8 @@ import { deleteUserCookie } from '@/common/common.js';
 
 const Index = ({data}) => {
 
+    /*  테스트 */
+
     const boardServerDomain = process.env.NEXT_PUBLIC_BOARD_SERVER_DOMAIN;
     const router = useRouter();
 
