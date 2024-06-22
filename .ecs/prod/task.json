@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:422443478711:task-definition/sample-task:1",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:422443478711:task-definition/task-efs:3",
     "containerDefinitions": [
         {
             "name": "sample",
@@ -16,13 +16,19 @@
             "essential": true,
             "environment": [],
             "environmentFiles": [],
-            "mountPoints": [],
+            "mountPoints": [
+                {
+                    "sourceVolume": "storage",
+                    "containerPath": "/upload",
+                    "readOnly": false
+                }
+            ],
             "volumesFrom": [],
             "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/sample-task",
+                    "awslogs-group": "/ecs/task-efs",
                     "awslogs-create-group": "true",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
@@ -32,11 +38,19 @@
             "systemControls": []
         }
     ],
-    "family": "sample-task",
+    "family": "task-efs",
     "executionRoleArn": "arn:aws:iam::422443478711:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 1,
-    "volumes": [],
+    "revision": 3,
+    "volumes": [
+        {
+            "name": "storage",
+            "efsVolumeConfiguration": {
+                "fileSystemId": "fs-04e1b12724c88d2d0",
+                "rootDirectory": "/"
+            }
+        }
+    ],
     "status": "ACTIVE",
     "requiresAttributes": [
         {
@@ -46,10 +60,19 @@
             "name": "ecs.capability.execution-role-awslogs"
         },
         {
+            "name": "ecs.capability.efsAuth"
+        },
+        {
             "name": "com.amazonaws.ecs.capability.ecr-auth"
         },
         {
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "ecs.capability.efs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.25"
         },
         {
             "name": "ecs.capability.execution-role-ecr-pull"
@@ -78,7 +101,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-06-20T07:21:20.919Z",
+    "registeredAt": "2024-06-22T03:15:49.662Z",
     "registeredBy": "arn:aws:iam::422443478711:root",
     "tags": []
 }
