@@ -7,4 +7,4 @@
 - 첨부파일 기능
 - 좋아요 기능(좋아요 눌렀을때 Kafka를 통한 글쓴이에게 알람)
 
-사용 기술 : Java, JPA, Spring Security, Junit, MariaDB, JWT, Kafka
+사용 기술 : Java, SpringBoot, Spring Security, JPA, Junit, MariaDB, JWT, Kafka
