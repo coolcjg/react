@@ -1,7 +1,7 @@
 평소 관심 기술을 공부하기 위하여 '여행중' 이라는 프로젝트를 구성해보았습니다.
 
 사이트의 서버  구성도입니다.
-![구성도](https://github.com/user-attachments/assets/311681f4-dd1e-41f6-b537-1afb885d49a3)
+![슬라이드1](https://github.com/user-attachments/assets/5d43bed9-e63c-4367-8de4-02cf0d1fd1eb)
 
 서버 구성은 다음과 같습니다.
 
@@ -12,7 +12,7 @@
 - 기술스택 : Java, SpringBoot, Spring Security, JPA, MariaDB, JWT, Kafka, Junit
 - https://github.com/coolcjg/board
 
-인코딩 서버
+인코더 서버
 - 스프링 스케줄러, Ffmpeg, ImageMagicK를 활용하여 동영상, 오디오, 이미지 인코딩작업을 진행
 - 게시판 서버로부터 인코딩 요청이 왔을 때 인코딩 작업을 진행하고, 결괏값을 게시판 서버로 REST API를 통하여 전달한다.
 - 기술스택 : Java, SpringBoot, JPA, MariaDB, Junit
