@@ -24,7 +24,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: sample # ecr 이름
+          ECR_REPOSITORY: react # ecr 이름
           IMAGE_TAG: ${{ github.run_number }} # git 커밋넘버를 이미지 이름 구분을 위해 넣어줌
         run: |
           # Build a docker container and
@@ -33,17 +33,52 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"        
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
+          
+      # - name: Fill in the new image ID in the Amazon ECS task definition
+      #   id: task-def
+      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+      #   with:
+      #     task-definition: .ecs/prod/task.json # task파일
+      #     container-name: sample #이미지 컨테이너 이름
+      #     image: ${{ steps.build-image.outputs.image }}
+      # - name: Deploy Amazon ECS task definition
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      #   with:
+      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+      #     service: service-react #클러스터 서비스 명
+      #     cluster: cluster-react # 클러스터 명
+      #     wait-for-service-stability: true
+      
+      - name: Setup Kustomize test
+        uses: imranismail/setup-kustomize@v1
+
+      - name: Checkout for Kustomize repository
+        uses: actions/checkout@v2
         with:
-          task-definition: .ecs/prod/task.json # task파일
-          container-name: sample #이미지 컨테이너 이름
-          image: ${{ steps.build-image.outputs.image }}
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: service-react #클러스터 서비스 명
-          cluster: cluster-react # 클러스터 명
-          wait-for-service-stability: true
+          # kubernetes yaml 파일 저장
+          repository: coolcjg/eks # k8s yaml 파일이 있는 repo
+          ref: master  # branch 이름
+          # 내 repository에 push 하기 위한 Personal Access Token이 필요
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }} # Github Action token을 발급받아서 repo secrect에 등록해줘야한다
+          path: eks # 최상위 경로로 repository와 동일하게 설정
+
+      # 새 이미지 버전으로 파일의 태그값 수정
+      # cd path 수정
+      # kustomize 로 image tag 값 변경
+      - name: Update Kubernetes resources
+        run: |
+          pwd
+          echo ${{ steps.build-image.outputs.image }}
+          cd eks
+          kustomize edit set image ${{ steps.build-image.outputs.image }}
+          cat kustomization.yaml
+
+      # 수정된 kustomization.yaml 파일 commit push
+      - name: Commit minifest files
+        run: |
+          cd eks
+          git config --global user.email "coolcjg@naver.com"
+          git config --global user.name "coolcjg"
+          git commit -am "Update image tag"
+          git push -u origin master
+

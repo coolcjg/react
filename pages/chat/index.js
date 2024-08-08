@@ -222,7 +222,7 @@ const Index = ({}) => {
                 
         e.stopPropagation();
         initDeleteDiv();
-        client.publish({destination:'/pub/chat/message', body:JSON.stringify({roomId:roomId, type:"ban", message:userId})});        
+        client.publish({destination:'/pub/chat/message', body:JSON.stringify({roomId:roomId, type:"ban", message:userId})});
     }
 
     const messageDiv = useRef();
