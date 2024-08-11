@@ -1,8 +1,9 @@
 관심 기술을 공부하기 위하여 '여행중' 이라는 프로젝트를 구성해보았습니다.
 
-사이트의 서버 구성도입니다.
+<br/>
 
-게시판, 인코딩
+1. 게시판, 인코딩
+![슬라이드1](https://github.com/user-attachments/assets/19ded1c6-43d2-4ddc-9650-411f4717e59e)
 - 게시글 관리 및 인코딩 담당.
 - 동영상, 오디오, 이미지가 업로드될 경우 Kafka서버로 'encoding'이라는 토픽으로 인코딩 요청 메시지 전달
 - 인코더 서버가 'encoding'토픽을 수신하여 FFMPEG, ImageMagick를 사용하여 파일 인코딩하여 DB에 결과 업데이트
@@ -11,24 +12,30 @@
 - 기술스택 : Java, Spring Boot, Spring Security, MariaDB, Kafka, Redis, JWT, Junit
 - https://github.com/coolcjg/board
 - https://github.com/coolcjg/encoder
+<br/>
 
-알람
+2. 알람
+![슬라이드2](https://github.com/user-attachments/assets/44f5a821-7daf-47ff-ba24-029b5f7d7a17)
 - Server Sent Event기술을 활용, 자바스크립트의 EventSource객체를 이용한 알람 기능 구현.
 - 사용자가 게시글에 대한 '좋아요' 버튼을 누를 경우, 서버에서 해당 이벤트를 Redis로 Pub
 - 알람서버는 Redis를 바라보고있고, 이벤트를 수신하여 사용자에게 전달한다.
 - Redis 연동 이유 : 알람서버가 여러개 구동중일 경우 모든 서버에 이벤트가 가야하므로, Redis의 Pub/Sub모델을 사용.
 - 기술스택 : Java, Spring Boot, Redis, Junit
 - https://github.com/coolcjg/alarm
+<br/>
 
-채팅
+3. 채팅
+![슬라이드3](https://github.com/user-attachments/assets/d01552c5-b3ac-494c-84a5-63079bc9e6da)
 - Websocket, stomp.js를 이용한 채팅기능 구현.
 - 채팅 기능을 처음부터 구현하고싶어서 프로젝트를 진행함.
 - 현재 접속자 리스트, 강제 퇴장 기능, 채팅 삭제 기능 구현.
 - Redis 연동 이유 : 채팅서버가 여러개 구동중일 경우 모든 서버에 이벤트가 가야하므로, Redis의 Pub/Sub모델을 사용.
 - 기술스택 : Java, Spring Boot, Redis, Junit
 - https://github.com/coolcjg/chat
+<br/>
 
-갤러리
+4. 갤러리
+![슬라이드4](https://github.com/user-attachments/assets/46726b06-cd3c-41be-9b5e-f33b60ad50c6)
 - 동영상, 이미지관련 게시글을 모아서 볼 수 있는 페이지
 - 스프링 배치기술을 활용하여 MariaDB에 있는 데이터를 MongoDB로 주기적으로 데이터 이동
 - MongoDB에 있는 데이터를 조회하여 동영상, 이미지 데이터를 제공
